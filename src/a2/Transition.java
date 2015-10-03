@@ -1,5 +1,12 @@
 package a2;
 
+/**
+ * 
+ * @author jake mingolla
+ *
+ * @param <A> {@link Graph}
+ * @param <B> {@link Graph}
+ */
 public abstract class Transition<A extends Graph, B extends Graph> implements Renderable {
 	protected A base;
 	protected B target;
