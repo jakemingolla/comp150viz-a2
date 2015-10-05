@@ -1,5 +1,3 @@
-package a2;
-
 /**
  * 
  * @author jake mingolla

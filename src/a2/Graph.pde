@@ -1,5 +1,3 @@
-package a2;
-
 import java.util.ArrayList;
 
 public abstract class Graph implements Renderable {

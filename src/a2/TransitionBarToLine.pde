@@ -1,5 +1,3 @@
-package a2;
-
 public class TransitionBarToLine extends Transition<BarGraph, LineGraph> {
 
 	TransitionBarToLine(BarGraph base, LineGraph target) {
