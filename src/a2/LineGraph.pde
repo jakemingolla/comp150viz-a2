@@ -2,7 +2,6 @@ import java.util.ArrayList;
 
 public class LineGraph extends Graph {
 
-    // successful push?
 	LineGraph(ArrayList<Data> values) {
 		super(values);
 	}
