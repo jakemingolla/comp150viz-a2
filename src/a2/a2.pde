@@ -5,6 +5,7 @@ import java.util.ArrayList;
 TransitionManager transitionManager;
 BarGraph barGraph;
 LineGraph lineGraph;
+PieGraph pieGraph;
 
 RenderState renderState;
 String data_path = "data.csv";
@@ -16,12 +17,16 @@ String[] nameLabels;
 void setup() {
 
     size(800, 600);
+    if(frame != null) {
+        frame.setResizable(true);
+    }
 
     ArrayList<Data> values = readData(data_path);
 
     /* TODO add nameLabels */
     barGraph  = new BarGraph(values);
     lineGraph = new LineGraph(values);
+    pieGraph = new PieGraph(values);
 
     transitionManager = new TransitionManager(barGraph, lineGraph);
 
@@ -29,6 +34,11 @@ void setup() {
 }
 
 void draw() {
+
+    //shit.txt
+/*    pieGraph.render();*/
+    barGraph.render();
+
     switch (renderState) {
     case LINE_RS:
         break;
@@ -53,8 +63,10 @@ public ArrayList<Data> readData(String path) {
     for (int i = 1; i < lines.length; i++) {
         String[] splitLine = split(lines[i], ",");
         ArrayList<Float> floatValues = new ArrayList<Float>();
-        for (int j = 0; j < splitLine.length; j++) {
+        println("---------------");
+        for (int j = 1; j < splitLine.length; j++) {
             floatValues.add(parseFloat(splitLine[j]));
+            println(splitLine[j]);
         }
         Data d = new Data(splitLine[0], floatValues);
         values.add(d);

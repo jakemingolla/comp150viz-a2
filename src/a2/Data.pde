@@ -10,11 +10,11 @@ public class Data {
 		this.values = values;
 	}
 
-	public String getName() {
+	public String getDataName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setDataName(String name) {
 		this.name = name;
 	}
 
