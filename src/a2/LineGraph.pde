@@ -66,6 +66,7 @@ public class LineGraph extends Graph {
         drawLabels(x_origin, y_origin);
 /*        drawBars(x_origin, y_origin);*/
         drawPoints();
+        drawLines();
         
 	}
 
@@ -111,48 +112,19 @@ public class LineGraph extends Graph {
 
     void drawPoints() {
         for(Point p : points) {
+            fill(0, 0, 0);
             ellipse(p.getX(), p.getY(), 5, 5);
         }
     }
 
-/*    void drawBars(int x_origin, int y_origin) {*/
-/**/
-/*        float max_height = findMax(values);*/
-/**/
-/*        int bar_width   = (int)((x_axis_width * 0.75)/values.size());*/
-/*        int space_width = (int)((x_axis_width * 0.25)/values.size());*/
-/**/
-/*        for (int i = 0; i < values.size(); i++) {*/
-/**/
-/*            float height_ratio = (values.get(i).getValues().get(0) / max_height);*/
-/**/
-/*            int bar_x = (x_origin + (i * bar_width) + ((i+1) * space_width));*/
-/*            int bar_y = (int)(y_origin - (y_axis_height * height_ratio));*/
-/**/
-/*            // if the highlighted one, change paint color for this rectangle to white*/
-/*            if (i == highlighted) {*/
-/*                fill (255, 255, 255);*/
-/*            // else purdy colorz*/
-/*            } else {*/
-/*                fill((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);*/
-/*            }*/
-/**/
+    void drawLines() {
+        for(int i = 1; i < points.size(); i++) {
+            Point p1 = points.get(i - 1); 
+            Point p2 = points.get(i); 
 
-/*            println("drawing rectangle with x = " + bar_x + ", y = " + bar_y + ", w = " + bar_width*/
-/*                    + ", h = " + (y_axis_height * height_ratio));*/
-/*                    */
-/*            rect(bar_x, bar_y, bar_width, (y_axis_height * height_ratio));*/
-/*            fill(#000000);*/
-/**/
-/*            pushMatrix();*/
-/*            translate(bar_x, bar_y + (y_axis_height * height_ratio) + (h * margin_ratio /8));*/
-/*            rotate(HALF_PI * 0.8);*/
-/*            text(values.get(i).getDataName(), 0, 0);*/
-/*            popMatrix();*/
-/*            */
-/*            text(values.get(i).getDataName(), bar_x, */
-/*                 bar_y + (y_axis_height * height_ratio) + (h * margin_ratio / 4));*/
-/*        } */
-/*    }*/
+            line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+        }
+    }
+
 
 }
