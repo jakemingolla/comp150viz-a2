@@ -37,7 +37,8 @@ void draw() {
 
     //shit.txt
 /*    pieGraph.render();*/
-    barGraph.render();
+/*    barGraph.render();*/
+    lineGraph.render();
 
     switch (renderState) {
     case LINE_RS:

@@ -23,7 +23,7 @@ public class Point {
         x = _x;
     }
 
-    public void setX(int _y) {
+    public void setY(int _y) {
         y = _y;
     }
 }

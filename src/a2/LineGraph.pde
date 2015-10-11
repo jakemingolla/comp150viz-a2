@@ -21,7 +21,7 @@ public class LineGraph extends Graph {
     ArrayList<Data>  values;
     ArrayList<Point> points;
 
-	BarGraph(ArrayList<Data> values) {
+	LineGraph(ArrayList<Data> values) {
 		super(values);
 
         w = width;
@@ -43,6 +43,7 @@ public class LineGraph extends Graph {
             println(d.getValues().get(0));
         }
 
+        points = new ArrayList<Point>();
         makePoints();
 
 	}
@@ -64,6 +65,7 @@ public class LineGraph extends Graph {
         drawAxes(x_origin, y_origin);
         drawLabels(x_origin, y_origin);
 /*        drawBars(x_origin, y_origin);*/
+        drawPoints();
         
 	}
 
@@ -91,10 +93,26 @@ public class LineGraph extends Graph {
     }
 
     void makePoints() {
-        int px = 0;
-        int py = 0;
 
         float max_height = findMax(values);
+        float line_len   = (x_axis_width / (values.size() + 1)); // half for each end
+
+        for(int i = 0; i < values.size(); i++ ) {
+            float height_ratio = (values.get(i).getValues().get(0) / max_height);
+
+            int px = (int)((i * line_len) + (line_len/2) + x_origin);
+            int py = (int)(y_origin - (y_axis_height * height_ratio));
+
+            Point tmp = new Point(px, py);
+            points.add(tmp);
+            println("adding new point at: " + px + ", " + py);
+        }
+    }
+
+    void drawPoints() {
+        for(Point p : points) {
+            ellipse(p.getX(), p.getY(), 5, 5);
+        }
     }
 
 /*    void drawBars(int x_origin, int y_origin) {*/
