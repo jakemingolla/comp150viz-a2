@@ -371,7 +371,6 @@ public class LineGraph extends Graph {
         /* re-render the parts of the graph */
         drawAxes(x_origin, y_origin);
         drawLabels(x_origin, y_origin);
-/*        drawBars(x_origin, y_origin);*/
         drawPoints();
         drawLines();
         
@@ -418,9 +417,22 @@ public class LineGraph extends Graph {
     }
 
     public void drawPoints() {
+        int i = 0;
         for(Point p : points) {
             fill(0, 0, 0);
             ellipse(p.getX(), p.getY(), 5, 5);
+
+            // draw data labels 
+            pushMatrix();
+            //slanted under data
+            //translate(p.getX(), p.getY() + (y_axis_height * (p.getY()/y_axis_height)) + (h * margin_ratio /8));
+/*            int py = p.getY();*/
+/*            int toAxis = y_origin - p.getY();*/
+            translate(p.getX(), p.getY() + (y_origin - p.getY()) + (height * margin_ratio /8));
+            rotate(HALF_PI * 0.8f);
+            text(values.get(i).getDataName(), 0, 0);
+            popMatrix();
+            i++;
         }
     }
 
@@ -430,8 +442,6 @@ public class LineGraph extends Graph {
             Point p2 = points.get(i); 
 
             line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
-/*            println("drawing from: " + p1.getX() + ", " + p1.getY());*/
-/*            println("drawing to  : " + p2.getX() + ", " + p2.getY());*/
         }
     }
 
