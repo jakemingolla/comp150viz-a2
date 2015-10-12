@@ -24,6 +24,10 @@ public abstract class Graph implements Renderable {
         return buttons;
     }
 
+    public float getMarginRatio() {
+        return margin_ratio;
+    }
+
     void makeButtons() {
         
         buttons.clear();
@@ -55,6 +59,10 @@ public abstract class Graph implements Renderable {
         for (Button b : buttons) {
             b.render();
         }
+    }
+
+    ArrayList<Data> getValues() {
+        return values;
     }
 
 

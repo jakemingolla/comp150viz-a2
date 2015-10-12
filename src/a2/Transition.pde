@@ -9,8 +9,8 @@ public abstract class Transition<A extends Graph, B extends Graph> implements Re
 	protected A base;
 	protected B target;
 
-    private int renderFrame = 0;
-    private int totalRenderFrame = 100;
+    protected int renderFrame = 0;
+    protected int totalRenderFrame = 600;
 	
 	Transition(A base, B target) {
 		this.base = base;
@@ -46,7 +46,7 @@ public abstract class Transition<A extends Graph, B extends Graph> implements Re
     }
 
     public void tick() {
-        renderFrame =+ 1;
+        renderFrame += 1;
     }
 
     public boolean isDone() {

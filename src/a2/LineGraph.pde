@@ -108,9 +108,6 @@ public class LineGraph extends Graph {
 
             int bar_x = (x_origin + (i * bar_width) + ((i+1) * space_width));
             int px = bar_x + (bar_width/2);
-            if(i == 0) {
-                println("---stored point x: " + px);
-            }
             int py = (int)(y_origin - (y_axis_height * height_ratio));
 
             Point tmp = new Point(px, py);
@@ -128,12 +125,9 @@ public class LineGraph extends Graph {
             pushMatrix();
             //slanted under data
             //translate(p.getX(), p.getY() + (y_axis_height * (p.getY()/y_axis_height)) + (h * margin_ratio /8));
-            if (i == 0){
-                println("text point x: " + p.getX());
-                println("py: " + (p.getY() +(y_origin - p.getY()) + (height * margin_ratio /8)));
-            }
 
-            translate(p.getX(), p.getY() + (y_origin - p.getY()) + (height * margin_ratio /8));
+            int bar_width   = (int)((x_axis_width * 0.75)/values.size());
+            translate(p.getX() - (bar_width/2), p.getY() + (y_origin - p.getY()) + (height * margin_ratio /8));
             rotate(HALF_PI * 0.8);
             textSize(12);
             textAlign(BOTTOM);

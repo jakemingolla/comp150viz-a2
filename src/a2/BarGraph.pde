@@ -30,12 +30,6 @@ public class BarGraph extends Graph {
         x_origin = (int)(w * margin_ratio);
         y_origin = (int)(h * (1 - margin_ratio));
 
-/*        println("BARGRAPH------------");*/
-/*        println("xo: " + x_origin);*/
-/*        println("yo: " + y_origin);*/
-/*        println("w: " + w);*/
-/*        println("h: " + h);*/
-
         xName = nameLabels[0];
         yName = nameLabels[1];
 
@@ -114,26 +108,16 @@ public class BarGraph extends Graph {
                 fill((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
             }
 
-/*
-            println("drawing rectangle with x = " + bar_x + ", y = " + bar_y + ", w = " + bar_width
-                    + ", h = " + (y_axis_height * height_ratio));
-                    */
             rect(bar_x, bar_y, bar_width, (y_axis_height * height_ratio));
             fill(#000000);
 
             pushMatrix();
-/*            translate(bar_x, bar_y + (y_axis_height * height_ratio) + (h * margin_ratio /8));*/
-            if (i == 0) {
-                println("bar x: " + bar_x);
-                println("bar y: " +  (bar_y + (y_origin - bar_y) + (height * margin_ratio /8)));
-            }
-
-            translate(bar_x, bar_y + (y_origin - bar_y) + (height * margin_ratio /8));
-            rotate(HALF_PI * 0.8);
-            textSize(12);
-            textAlign(BOTTOM);
-            text(values.get(i).getDataName(), 0, 0);
-            textAlign(LEFT);
+                translate(bar_x, bar_y + (y_origin - bar_y) + (height * margin_ratio /8));
+                rotate(HALF_PI * 0.8);
+                textSize(12);
+                textAlign(BOTTOM);
+                text(values.get(i).getDataName(), 0, 0);
+                textAlign(LEFT);
             popMatrix();
             
 /*            text(values.get(i).getDataName(), bar_x, */

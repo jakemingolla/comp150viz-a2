@@ -7,7 +7,8 @@ BarGraph barGraph;
 LineGraph lineGraph;
 PieGraph pieGraph;
 
-RenderState renderState;
+RenderState currentRenderState;
+RenderState prevRenderState;
 String data_path = "data.csv";
 
 
@@ -30,43 +31,57 @@ void setup() {
 
     transitionManager = new TransitionManager(barGraph, lineGraph, pieGraph);
 
-    renderState = RenderState.LINE_RS;
+    currentRenderState = RenderState.LINE_RS;
 }
 
 void mousePressed() {
     for (Button b : lineGraph.getButtons()) {
         if (b.isInside(mouseX, mouseY)) {
-            renderState = b.getRenderState();
+            prevRenderState = currentRenderState;
+            currentRenderState = b.getRenderState();
+            println("CHANGED RENDER STATES");
         }
     }
 }
 
 void draw() {
-    switch (renderState) {
-    case LINE_RS:
-        background(200, 200, 200);
-        lineGraph.render();
-        lineGraph.renderButtons();
-        break;
-    case BAR_RS:
-        background(200, 200, 200);
-        barGraph.render();
-        barGraph.renderButtons();
-        break;
-    case PIE_RS:
-        background(200, 200, 200);
-        pieGraph.render();
-        pieGraph.renderButtons();
-        break;
-    case BAR2LINE_RS:
-        Transition t = transitionManager.getTransition(BarGraph.class, LineGraph.class);
+    println("in draw!");
+    if (prevRenderState == RenderState.BAR_RS && currentRenderState == RenderState.LINE_RS) {
+        println("1");
+        //Transition t = transitionManager.getTransition(BarGraph.class, LineGraph.class);
+
+        TransitionBarToLine t = new TransitionBarToLine(barGraph, lineGraph);
+/*        clear();*/
         drawTransition(t);
-        break;
+        println("2");
+    } else {
+        switch (currentRenderState) {
+        case LINE_RS:
+            background(200, 200, 200);
+            lineGraph.render();
+            lineGraph.renderButtons();
+            break;
+        case BAR_RS:
+/*            background(200, 200, 200);*/
+            //barGraph.render();
+            barGraph.renderButtons();
+            break;
+        case PIE_RS:
+            background(200, 200, 200);
+            pieGraph.render();
+            pieGraph.renderButtons();
+            break;
+        }
     }
 }
 
 void drawTransition(Transition transition) {
     while (!transition.isDone()) {
+/*        background(200, 200, 200);*/
+        //println("rendering t = " + transition.getRenderFrame());
+/*        if(transition.getRenderFrame() == 200) {*/
+/*            println(">>DISAPPEAR!");*/
+/*        }*/
         transition.render();
         transition.tick();
     }
