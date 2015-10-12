@@ -32,21 +32,15 @@ public class LineGraph extends Graph {
         x_origin = (int)(w * margin_ratio);
         y_origin = (int)(h * (1 - margin_ratio));
 
-        println("LINEGRAPH------------");
-        println("xo: " + x_origin);
-        println("yo: " + y_origin);
-        println("w: " + w);
-        println("h: " + h);
-
         xName = nameLabels[0];
         yName = nameLabels[1];
 
         this.values = values;
 
-        println("in line graph, values are: ");
-        for (Data d : values) {
-            println(d.getValues().get(0));
-        }
+/*        println("in line graph, values are: ");*/
+/*        for (Data d : values) {*/
+/*            println(d.getValues().get(0));*/
+/*        }*/
 
         points = new ArrayList<Point>();
 
@@ -103,12 +97,20 @@ public class LineGraph extends Graph {
     void makePoints() {
 
         float max_height = findMax(values);
-        float line_len   = (x_axis_width / (values.size() + 1)); // half for each end
+        float line_len   = (x_axis_width / (values.size())); // half for each end
 
         for(int i = 0; i < values.size(); i++ ) {
             float height_ratio = (values.get(i).getValues().get(0) / max_height);
 
-            int px = (int)((i * line_len) + (line_len/2) + x_origin);
+            // LOL
+            int bar_width   = (int)((x_axis_width * 0.75)/values.size());
+            int space_width = (int)((x_axis_width * 0.25)/values.size()); 
+
+            int bar_x = (x_origin + (i * bar_width) + ((i+1) * space_width));
+            int px = bar_x + (bar_width/2);
+            if(i == 0) {
+                println("---stored point x: " + px);
+            }
             int py = (int)(y_origin - (y_axis_height * height_ratio));
 
             Point tmp = new Point(px, py);
@@ -126,9 +128,17 @@ public class LineGraph extends Graph {
             pushMatrix();
             //slanted under data
             //translate(p.getX(), p.getY() + (y_axis_height * (p.getY()/y_axis_height)) + (h * margin_ratio /8));
+            if (i == 0){
+                println("text point x: " + p.getX());
+                println("py: " + (p.getY() +(y_origin - p.getY()) + (height * margin_ratio /8)));
+            }
+
             translate(p.getX(), p.getY() + (y_origin - p.getY()) + (height * margin_ratio /8));
             rotate(HALF_PI * 0.8);
+            textSize(12);
+            textAlign(BOTTOM);
             text(values.get(i).getDataName(), 0, 0);
+            textAlign(LEFT);
             popMatrix();
             i++;
         }

@@ -51,7 +51,7 @@ public void setup() {
     lineGraph = new LineGraph(values);
     pieGraph = new PieGraph(values);
 
-    transitionManager = new TransitionManager(barGraph, lineGraph);
+    transitionManager = new TransitionManager(barGraph, lineGraph, pieGraph);
 
     renderState = RenderState.LINE_RS;
 }
@@ -81,6 +81,17 @@ public void draw() {
         pieGraph.render();
         pieGraph.renderButtons();
         break;
+    case BAR2LINE_RS:
+        Transition t = transitionManager.getTransition(BarGraph.class, LineGraph.class);
+        drawTransition(t);
+        break;
+    }
+}
+
+public void drawTransition(Transition transition) {
+    while (!transition.isDone()) {
+        transition.render();
+        transition.tick();
     }
 }
 
@@ -143,22 +154,21 @@ public class BarGraph extends Graph {
         x_origin = (int)(w * margin_ratio);
         y_origin = (int)(h * (1 - margin_ratio));
 
-        println("BARGRAPH------------");
-        println("xo: " + x_origin);
-        println("yo: " + y_origin);
-        println("w: " + w);
-        println("h: " + h);
+/*        println("BARGRAPH------------");*/
+/*        println("xo: " + x_origin);*/
+/*        println("yo: " + y_origin);*/
+/*        println("w: " + w);*/
+/*        println("h: " + h);*/
 
         xName = nameLabels[0];
         yName = nameLabels[1];
 
         this.values = values;
 
-        println("in barGraph, values are: ");
-        for (Data d : values) {
-            println(d.getValues().get(0));
-        }
-
+/*        println("in barGraph, values are: ");*/
+/*        for (Data d : values) {*/
+/*            println(d.getValues().get(0));*/
+/*        }*/
 	}
 
 	@Override
@@ -236,9 +246,18 @@ public class BarGraph extends Graph {
             fill(0xff000000);
 
             pushMatrix();
-            translate(bar_x, bar_y + (y_axis_height * height_ratio) + (h * margin_ratio /8));
+/*            translate(bar_x, bar_y + (y_axis_height * height_ratio) + (h * margin_ratio /8));*/
+            if (i == 0) {
+                println("bar x: " + bar_x);
+                println("bar y: " +  (bar_y + (y_origin - bar_y) + (height * margin_ratio /8)));
+            }
+
+            translate(bar_x, bar_y + (y_origin - bar_y) + (height * margin_ratio /8));
             rotate(HALF_PI * 0.8f);
+            textSize(12);
+            textAlign(BOTTOM);
             text(values.get(i).getDataName(), 0, 0);
+            textAlign(LEFT);
             popMatrix();
             
 /*            text(values.get(i).getDataName(), bar_x, */
@@ -458,21 +477,15 @@ public class LineGraph extends Graph {
         x_origin = (int)(w * margin_ratio);
         y_origin = (int)(h * (1 - margin_ratio));
 
-        println("LINEGRAPH------------");
-        println("xo: " + x_origin);
-        println("yo: " + y_origin);
-        println("w: " + w);
-        println("h: " + h);
-
         xName = nameLabels[0];
         yName = nameLabels[1];
 
         this.values = values;
 
-        println("in line graph, values are: ");
-        for (Data d : values) {
-            println(d.getValues().get(0));
-        }
+/*        println("in line graph, values are: ");*/
+/*        for (Data d : values) {*/
+/*            println(d.getValues().get(0));*/
+/*        }*/
 
         points = new ArrayList<Point>();
 
@@ -529,12 +542,22 @@ public class LineGraph extends Graph {
     public void makePoints() {
 
         float max_height = findMax(values);
-        float line_len   = (x_axis_width / (values.size() + 1)); // half for each end
+        float line_len   = (x_axis_width / (values.size())); // half for each end
 
         for(int i = 0; i < values.size(); i++ ) {
             float height_ratio = (values.get(i).getValues().get(0) / max_height);
 
-            int px = (int)((i * line_len) + (line_len/2) + x_origin);
+            // LOL
+            int bar_width   = (int)((x_axis_width * 0.75f)/values.size());
+            int space_width = (int)((x_axis_width * 0.25f)/values.size()); 
+
+            int bar_x = (x_origin + (i * bar_width) + ((i+1) * space_width));
+
+/*            int px = (int)(((i * line_len) +  x_origin + (line_len/2.0)));*/
+            int px = bar_x; //+ (bar_width/2);
+            if(i == 0) {
+                println("---stored point x: " + px);
+            }
             int py = (int)(y_origin - (y_axis_height * height_ratio));
 
             Point tmp = new Point(px, py);
@@ -552,9 +575,17 @@ public class LineGraph extends Graph {
             pushMatrix();
             //slanted under data
             //translate(p.getX(), p.getY() + (y_axis_height * (p.getY()/y_axis_height)) + (h * margin_ratio /8));
+            if (i == 0){
+                println("text point x: " + p.getX());
+                println("py: " + (p.getY() +(y_origin - p.getY()) + (height * margin_ratio /8)));
+            }
+
             translate(p.getX(), p.getY() + (y_origin - p.getY()) + (height * margin_ratio /8));
             rotate(HALF_PI * 0.8f);
+            textSize(12);
+            textAlign(BOTTOM);
             text(values.get(i).getDataName(), 0, 0);
+            textAlign(LEFT);
             popMatrix();
             i++;
         }
@@ -584,6 +615,7 @@ public class LineGraph extends Graph {
     String xName;
     String yName;
     int highlighted = -1;
+    int framesRendered = 0;
 
     ///data
     float sum = 0;
@@ -605,7 +637,7 @@ public class LineGraph extends Graph {
         xName = nameLabels[0];
         yName = nameLabels[1];
 
-        radius = (int)(height/(4.0f/3));
+        radius = (int)(height/(5.0f/3));
 
         this.values = values;
 
@@ -672,6 +704,10 @@ public class LineGraph extends Graph {
         /* re-render the parts of the graph */
         drawSlices();
         is_hovering();
+
+        if(framesRendered < 101) {
+            println("render frame: " + framesRendered++);
+        }
     }
 
    
@@ -784,6 +820,9 @@ public interface Renderable {
 public abstract class Transition<A extends Graph, B extends Graph> implements Renderable {
 	protected A base;
 	protected B target;
+
+    private int renderFrame = 0;
+    private int totalRenderFrame = 100;
 	
 	Transition(A base, B target) {
 		this.base = base;
@@ -797,24 +836,40 @@ public abstract class Transition<A extends Graph, B extends Graph> implements Re
 	public Class<B> getTargetClass() {
 		return (Class) target.getClass();
 	}
-	
-	public void transition() {
-	}
+
+    public void setRenderFrame(int renderFrame) {
+        this.renderFrame = renderFrame;
+    }
+
+    public void setTotalRenderFrame(int totalRenderFrame) {
+        this.totalRenderFrame = totalRenderFrame;
+    }
+
+    public int getRenderFrame() {
+        return renderFrame;
+    }
+
+    public int getTotalRenderFrame() {
+        return totalRenderFrame;
+    }
+
+    public void resetRenderFrame() {
+        renderFrame = 0;
+    }
+
+    public void tick() {
+        renderFrame =+ 1;
+    }
+
+    public boolean isDone() {
+        return renderFrame == totalRenderFrame;
+    }
 }
 public class TransitionBarToLine extends Transition<BarGraph, LineGraph> {
 
 	TransitionBarToLine(BarGraph base, LineGraph target) {
 		super(base, target);
 		// TODO Auto-generated constructor stub
-	}
-	
-	@Override
-	public void transition() {
-		System.out.println("Transitioning from a BarGraph to a LineGraph");
-		System.out.println("Calling BarGraph render():");
-		base.render();
-		System.out.println("Calling LineGraph render():");
-		target.render();
 	}
 	
 	@Override
@@ -828,11 +883,16 @@ public class TransitionBarToLine extends Transition<BarGraph, LineGraph> {
 public class TransitionManager {
 	
 	public ArrayList<Transition> transitions;
+
+    public int maxFrameCounter, frameCounter;
 	
-	TransitionManager(BarGraph barGraph, LineGraph lineGraph) {
+	TransitionManager(BarGraph barGraph, LineGraph lineGraph, PieGraph pieGraph) {
 		transitions = new ArrayList<Transition>();
 		TransitionBarToLine barToLine = new TransitionBarToLine(barGraph, lineGraph);
 		transitions.add(barToLine);
+
+        maxFrameCounter = 100;
+        frameCounter = 0;
 	}
 	
 	public void addTransition(Transition<? extends Graph, ? extends Graph> transition) {

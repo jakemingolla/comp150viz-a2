@@ -28,7 +28,7 @@ void setup() {
     lineGraph = new LineGraph(values);
     pieGraph = new PieGraph(values);
 
-    transitionManager = new TransitionManager(barGraph, lineGraph);
+    transitionManager = new TransitionManager(barGraph, lineGraph, pieGraph);
 
     renderState = RenderState.LINE_RS;
 }
@@ -58,6 +58,17 @@ void draw() {
         pieGraph.render();
         pieGraph.renderButtons();
         break;
+    case BAR2LINE_RS:
+        Transition t = transitionManager.getTransition(BarGraph.class, LineGraph.class);
+        drawTransition(t);
+        break;
+    }
+}
+
+void drawTransition(Transition transition) {
+    while (!transition.isDone()) {
+        transition.render();
+        transition.tick();
     }
 }
 

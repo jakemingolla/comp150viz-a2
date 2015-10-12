@@ -12,6 +12,7 @@
     String xName;
     String yName;
     int highlighted = -1;
+    int framesRendered = 0;
 
     ///data
     float sum = 0;
@@ -100,6 +101,10 @@
         /* re-render the parts of the graph */
         drawSlices();
         is_hovering();
+
+        if(framesRendered < 101) {
+            println("render frame: " + framesRendered++);
+        }
     }
 
    
