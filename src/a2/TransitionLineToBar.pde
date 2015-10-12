@@ -1,10 +1,10 @@
-public class TransitionBarToLine extends Transition<BarGraph, LineGraph> {
+public class TransitionLineToBar extends Transition<LineGraph, BarGraph> {
 
 
     ArrayList<Point> points;
     ArrayList<Data> values;
 
-	TransitionBarToLine(BarGraph base, LineGraph target) {
+	TransitionLineToBar(LineGraph base, BarGraph target) {
 		super(base, target);
 		// TODO Auto-generated constructor stub
         points = new ArrayList<Point>();
@@ -13,6 +13,7 @@ public class TransitionBarToLine extends Transition<BarGraph, LineGraph> {
 	
 /*	@Override*/
 	void render() {
+        println("Rendering frame = " + renderFrame);
         /* update canvas fields */
         int w = width;
         int h = height;
@@ -47,41 +48,41 @@ public class TransitionBarToLine extends Transition<BarGraph, LineGraph> {
             // else purdy colorz
             fill((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
             
-            if (renderFrame < (totalRenderFrame / 3)) {
+            if (renderFrame >= (2 * totalRenderFrame/3)) {
 
                 stageFrames = totalRenderFrame / 3;
-                frameOffset = 0;
+                frameOffset = 2 * totalRenderFrame / 3;
                 float drawHeightRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
-                rect(bar_x, bar_y, bar_width, (y_axis_height * height_ratio) * (1- drawHeightRatio));
+                rect(bar_x, bar_y, bar_width, (y_axis_height * height_ratio) * (drawHeightRatio));
 
-            } else if ((renderFrame >= totalRenderFrame/3) && (renderFrame < totalRenderFrame /2)) {
+            } else if ((renderFrame >= totalRenderFrame/2) && (renderFrame < (2 * totalRenderFrame /3))) {
         
                 stageFrames = totalRenderFrame / 6;
-                frameOffset = totalRenderFrame / 3;
+                frameOffset = totalRenderFrame / 2;
                 float drawWidthRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
                 int bar_left = bar_x;
                 int bar_right = bar_x + bar_width;
-                line(bar_left + ((bar_width/2) * (drawWidthRatio)), bar_y, bar_right - ((bar_width/2) * (drawWidthRatio)), bar_y);
-/*                line(bar_x + ((bar_width/2) * (1 - drawWidthRatio)), bar_y, (bar_x + (bar_width/2)) - ((bar_width/2) * (1 - drawWidthRatio)), bar_y);*/
-/*                println("in middle third, frame = " + renderFrame);*/
-            } else if ((renderFrame >= totalRenderFrame/2) && (renderFrame < 3 * totalRenderFrame / 4)) {
+                line(bar_left + ((bar_width/2) * (1 - drawWidthRatio)), bar_y, bar_right - ((bar_width/2) * (1 - drawWidthRatio)), bar_y);
+
+            } else if ((renderFrame >= totalRenderFrame/4) && (renderFrame < totalRenderFrame / 2)) {
+
                 stageFrames = totalRenderFrame / 4;
-                frameOffset = totalRenderFrame / 2;
+                frameOffset = totalRenderFrame / 4;
 
                 int px = bar_x + bar_width/2;
                 int py = bar_y;
                 float radius = 1;
                 float radiusRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
 
-/*                fill(0, 0, 0);*/
-                ellipse(px, py, 5 * radiusRatio, 5 * radiusRatio);
-            } else if (renderFrame >= 3 * totalRenderFrame/4) {
+                ellipse(px, py, 5 * (1 - radiusRatio), 5 * (1 - radiusRatio));
+
+            } else if (renderFrame < (totalRenderFrame / 4)) {
+
                 stageFrames = totalRenderFrame / 4;
-                frameOffset = 3 * totalRenderFrame / 4;
+                //frameOffset = totalRenderFrame / 4;
+                frameOffset = 0;
 
                 float lineRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
-
-/*                makePoints(margin_ratio);*/
 
                 // make points
                 int px = bar_x + (bar_width/2);
@@ -100,12 +101,9 @@ public class TransitionBarToLine extends Transition<BarGraph, LineGraph> {
                     int y1 = p1.getY();
                     int x2 = p2.getX();
                     int y2 = p2.getY();
-                    line(x1, y1, (x2 - x1) * lineRatio + x1, (y2 - y1) * lineRatio + y1);
+                    line(x1, y1, ((x2 - x1) * (1 - lineRatio)) + x1, ((y2 - y1) * (1 - lineRatio)) + y1);
                 }
             }
-   
-
-/*        }*/
 
             fill(#000000);
 

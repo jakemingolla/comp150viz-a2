@@ -8,11 +8,12 @@ public class TransitionManager {
 	
 	TransitionManager(BarGraph barGraph, LineGraph lineGraph, PieGraph pieGraph) {
 		transitions = new ArrayList<Transition>();
+
 		TransitionBarToLine barToLine = new TransitionBarToLine(barGraph, lineGraph);
 		transitions.add(barToLine);
 
-        maxFrameCounter = 100;
-        frameCounter = 0;
+        TransitionLineToBar lineToBar = new TransitionLineToBar(lineGraph, barGraph);
+        transitions.add(lineToBar);
 	}
 	
 	public void addTransition(Transition<? extends Graph, ? extends Graph> transition) {

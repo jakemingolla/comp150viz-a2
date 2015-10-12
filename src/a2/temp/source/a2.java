@@ -31,16 +31,18 @@ LineGraph lineGraph;
 PieGraph pieGraph;
 
 RenderState currentRenderState;
-RenderState prevRenderState;
+Graph currentGraph;
 String data_path = "data.csv";
 
 
 ArrayList<Data> dataPoints = new ArrayList<Data>();
 String[] nameLabels;
+int time;
 
 public void setup() {
 
     size(800, 600);
+    frameRate(60);
     if(frame != null) {
         frame.setResizable(true);
     }
@@ -55,58 +57,106 @@ public void setup() {
     transitionManager = new TransitionManager(barGraph, lineGraph, pieGraph);
 
     currentRenderState = RenderState.LINE_RS;
+    currentGraph = lineGraph;
+    
+    time = 0;
 }
 
 public void mousePressed() {
-    for (Button b : lineGraph.getButtons()) {
+    println("mouse pressed");
+    for (Button b : currentGraph.getButtons()) {
         if (b.isInside(mouseX, mouseY)) {
-            prevRenderState = currentRenderState;
-            currentRenderState = b.getRenderState();
-            println("CHANGED RENDER STATES");
+            println("clicked on button");
+            if (currentRenderState == RenderState.BAR_RS) {
+                println("currently BAR");
+                if (b.getRenderState() == RenderState.LINE_RS) {
+                    println("want LINE");
+                    currentRenderState = RenderState.BAR2LINE_RS;
+                    currentGraph = barGraph;
+                } else if (b.getRenderState() == RenderState.PIE_RS) {
+                    println("want PIE");
+                    currentRenderState = RenderState.BAR2PIE_RS;
+                    currentGraph = pieGraph;
+                } else {
+                    println("want BAR");
+                    currentRenderState = RenderState.BAR_RS;
+                    currentGraph = barGraph;
+                }
+            } else if (currentRenderState == RenderState.LINE_RS) {
+                println("currently LINE");
+                if (b.getRenderState() == RenderState.BAR_RS) {
+                    println("want BAR");
+                    currentRenderState = RenderState.LINE2BAR_RS;
+                    currentGraph = barGraph;
+                } else {
+                // no line to pie
+                    println("want LINE");
+                    currentRenderState = RenderState.LINE_RS;
+                    currentGraph = lineGraph;
+                }
+            } else if (currentRenderState == RenderState.PIE_RS) {
+                println("currently PIE");
+                if (b.getRenderState() == RenderState.BAR_RS) {
+                    println("want BAR");
+                    currentRenderState = RenderState.PIE2BAR_RS;
+                    currentGraph = barGraph;
+                } else {
+                    println("want PIE");
+                    currentRenderState = RenderState.PIE_RS;
+                    currentGraph = pieGraph;
+                }
+            }
         }
     }
 }
 
 public void draw() {
-    println("in draw!");
-    if (prevRenderState == RenderState.BAR_RS && currentRenderState == RenderState.LINE_RS) {
-        println("1");
-        //Transition t = transitionManager.getTransition(BarGraph.class, LineGraph.class);
-
-        TransitionBarToLine t = new TransitionBarToLine(barGraph, lineGraph);
-/*        clear();*/
+    background(200, 200, 200);
+    currentGraph.renderButtons();
+    Transition t;
+    switch (currentRenderState) {
+    case BAR2LINE_RS:
+        t = transitionManager.getTransition(BarGraph.class, LineGraph.class);
         drawTransition(t);
-        println("2");
-    } else {
-        switch (currentRenderState) {
-        case LINE_RS:
-            background(200, 200, 200);
-            lineGraph.render();
-            lineGraph.renderButtons();
-            break;
-        case BAR_RS:
-/*            background(200, 200, 200);*/
-            //barGraph.render();
-            barGraph.renderButtons();
-            break;
-        case PIE_RS:
-            background(200, 200, 200);
-            pieGraph.render();
-            pieGraph.renderButtons();
-            break;
-        }
+        break;
+    case BAR2PIE_RS:
+        currentRenderState = RenderState.PIE_RS;
+        break;
+    case LINE2BAR_RS:
+        t = transitionManager.getTransition(LineGraph.class, BarGraph.class);
+        drawTransition(t);
+        break;
+     case PIE2BAR_RS:
+        currentRenderState = RenderState.BAR_RS;
+        break;
+    case LINE_RS:
+        lineGraph.render();
+/*        lineGraph.renderButtons();*/
+        break;
+    case BAR_RS:
+        barGraph.render();
+/*        barGraph.renderButtons();*/
+        break;
+    case PIE_RS:
+        pieGraph.render();
+/*        pieGraph.renderButtons();*/
+        break;
     }
 }
 
 public void drawTransition(Transition transition) {
-    while (!transition.isDone()) {
-/*        background(200, 200, 200);*/
-        //println("rendering t = " + transition.getRenderFrame());
-/*        if(transition.getRenderFrame() == 200) {*/
-/*            println(">>DISAPPEAR!");*/
-/*        }*/
+    if (!transition.isDone()) {
         transition.render();
         transition.tick();
+    } else {
+        transition.resetRenderFrame();
+        if (transition.getTargetClass() == BarGraph.class) {
+            currentRenderState = RenderState.BAR_RS;
+        } else if (transition.getTargetClass() == LineGraph.class) {
+            currentRenderState = RenderState.LINE_RS;
+        } else if (transition.getTargetClass() == PieGraph.class) {
+            currentRenderState = RenderState.PIE_RS;
+        }
     }
 }
 
@@ -327,29 +377,39 @@ public class Button implements Renderable {
     @Override
     public void render() {
         stroke(0, 0, 0);
-        if (isInside(mouseX, mouseY)) {
-            fill(255, 0, 0);
+        if (currentRenderState == RenderState.LINE_RS || currentRenderState == RenderState.BAR_RS || currentRenderState == RenderState.PIE_RS) {
+            if (isInside(mouseX, mouseY)) {
+                fill(255, 0, 0);
+            } else {
+                //fill (100, 100, 100);
+                fill(255, 255, 255);
+            }
         } else {
-            //fill (100, 100, 100);
-            fill(255, 255, 255);
+            fill(55, 55, 55);
         }
         rect(x, y, w, h);
-        String t = "";
-        switch(state) {
-            case LINE_RS:
-                t = "LINE";
-                break;
-            case BAR_RS:
-                t = "BAR";
-                break;
-            case PIE_RS:
-                t = "PIE";
-                break;
+
+        if (currentRenderState == RenderState.LINE_RS || currentRenderState == RenderState.BAR_RS || currentRenderState == RenderState.PIE_RS) {
+            String t = "";
+            switch(state) {
+                case LINE_RS:
+                    t = "LINE";
+                    break;
+                case BAR_RS:
+                    t = "BAR";
+                    break;
+                case PIE_RS:
+                    t = "PIE";
+                    break;
+                default:
+            }
+            textAlign(CENTER);
+            //text(t, x + w/2, y + h/2, w, h);
+            fill(0, 255, 0);
+            text(t, x , y , w, h);
+        } else {
+
         }
-        textAlign(CENTER);
-        //text(t, x + w/2, y + h/2, w, h);
-        fill(0, 255, 0);
-        text(t, x , y , w, h);
     }
 }
 
@@ -570,7 +630,7 @@ public class LineGraph extends Graph {
     public void drawPoints() {
         int i = 0;
         for(Point p : points) {
-            fill(0, 0, 0);
+            fill((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
             ellipse(p.getX(), p.getY(), 5, 5);
 
             // draw data labels 
@@ -583,6 +643,7 @@ public class LineGraph extends Graph {
             rotate(HALF_PI * 0.8f);
             textSize(12);
             textAlign(BOTTOM);
+            fill(0, 0, 0);
             text(values.get(i).getDataName(), 0, 0);
             textAlign(LEFT);
             popMatrix();
@@ -862,16 +923,19 @@ public abstract class Transition<A extends Graph, B extends Graph> implements Re
 }
 public class TransitionBarToLine extends Transition<BarGraph, LineGraph> {
 
+
+    ArrayList<Point> points;
+    ArrayList<Data> values;
+
 	TransitionBarToLine(BarGraph base, LineGraph target) {
 		super(base, target);
 		// TODO Auto-generated constructor stub
+        points = new ArrayList<Point>();
+        values = base.getValues();
 	}
 	
 /*	@Override*/
 	public void render() {
-        
-/*        println("renderFrame (IN RENDER START) == " + renderFrame);*/
-        
         /* update canvas fields */
         int w = width;
         int h = height;
@@ -882,64 +946,281 @@ public class TransitionBarToLine extends Transition<BarGraph, LineGraph> {
         int y_origin = (int)(height * (1 - margin_ratio));
 
         /* re-render the parts of the graph */
+        drawAxes(margin_ratio);
+        drawLabels(x_origin, y_origin, margin_ratio);
         
         int stageFrames;
+        int frameOffset;
 
-/*        println("rf: " + renderFrame);*/
+        float max_height = base.findMax(values);
+
+        int bar_width   = (int)((x_axis_width * 0.75f)/values.size());
+        int space_width = (int)((x_axis_width * 0.25f)/values.size());
+
+        points.clear();
+
+        for (int i = 0; i < values.size(); i++) {
+
+            float height_ratio = (values.get(i).getValues().get(0) / max_height);
+
+            int bar_x = (x_origin + (i * bar_width) + ((i+1) * space_width));
+            int bar_y = (int)(y_origin - (y_axis_height * height_ratio));
+
+            // if the highlighted one, change paint color for this rectangle to white
+            // else purdy colorz
+            fill((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
+            
+            if (renderFrame < (totalRenderFrame / 3)) {
+
+                stageFrames = totalRenderFrame / 3;
+                frameOffset = 0;
+                float drawHeightRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
+                rect(bar_x, bar_y, bar_width, (y_axis_height * height_ratio) * (1- drawHeightRatio));
+
+            } else if ((renderFrame >= totalRenderFrame/3) && (renderFrame < totalRenderFrame /2)) {
+        
+                stageFrames = totalRenderFrame / 6;
+                frameOffset = totalRenderFrame / 3;
+                float drawWidthRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
+                int bar_left = bar_x;
+                int bar_right = bar_x + bar_width;
+                line(bar_left + ((bar_width/2) * (drawWidthRatio)), bar_y, bar_right - ((bar_width/2) * (drawWidthRatio)), bar_y);
+/*                line(bar_x + ((bar_width/2) * (1 - drawWidthRatio)), bar_y, (bar_x + (bar_width/2)) - ((bar_width/2) * (1 - drawWidthRatio)), bar_y);*/
+/*                println("in middle third, frame = " + renderFrame);*/
+            } else if ((renderFrame >= totalRenderFrame/2) && (renderFrame < 3 * totalRenderFrame / 4)) {
+                stageFrames = totalRenderFrame / 4;
+                frameOffset = totalRenderFrame / 2;
+
+                int px = bar_x + bar_width/2;
+                int py = bar_y;
+                float radius = 1;
+                float radiusRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
+
+/*                fill(0, 0, 0);*/
+                ellipse(px, py, 5 * radiusRatio, 5 * radiusRatio);
+            } else if (renderFrame >= 3 * totalRenderFrame/4) {
+                stageFrames = totalRenderFrame / 4;
+                frameOffset = 3 * totalRenderFrame / 4;
+
+                float lineRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
+
+/*                makePoints(margin_ratio);*/
+
+                // make points
+                int px = bar_x + (bar_width/2);
+                int py = (int)(y_origin - (y_axis_height * height_ratio));
+
+                Point tmp = new Point(px, py);
+                points.add(tmp);
+
+                ellipse(points.get(i).getX(), points.get(i).getY(), 5, 5);
+
+                if(i > 0) {
+                    Point p1 = points.get(i-1);
+                    Point p2 = points.get(i);
+
+                    int x1 = p1.getX();
+                    int y1 = p1.getY();
+                    int x2 = p2.getX();
+                    int y2 = p2.getY();
+                    line(x1, y1, (x2 - x1) * lineRatio + x1, (y2 - y1) * lineRatio + y1);
+                }
+            }
+   
+
+/*        }*/
+
+            fill(0xff000000);
+
+            pushMatrix();
+                translate(bar_x, bar_y + (y_origin - bar_y) + (height * margin_ratio /8));
+                rotate(HALF_PI * 0.8f);
+                textSize(12);
+                textAlign(BOTTOM);
+                text(values.get(i).getDataName(), 0, 0);
+                textAlign(LEFT);
+            popMatrix();
+        }
+    }
+
+    public void drawLabels(int x_origin, int y_origin, float margin_ratio) {
+
+        textAlign(LEFT);
+        fill(0, 0, 0);
+
+        String xName = nameLabels[0];
+        String yName = nameLabels[1];
+
+        int w = width;
+        int h = height;
+
+        int axis_h = (int)(height * (1 - margin_ratio));
+        text(xName, x_origin + (w * margin_ratio / 2),
+            y_origin + (h * margin_ratio / 2),
+            x_origin + (w * margin_ratio / 2),
+            y_origin + (h * margin_ratio / 2));
+        text(yName, x_origin - (w * margin_ratio / 2),
+             y_origin - (h * margin_ratio / 2), x_origin, y_origin);
+
+    }
+
+    public void drawAxes(float margin_ratio) {
+        int axis_h = (int)(height * (1 - margin_ratio));
+        //x axis
+        line(width * margin_ratio, axis_h, (width * (1-margin_ratio)), axis_h);
+        //y axis
+        line(width * margin_ratio, axis_h, width * margin_ratio, height * margin_ratio);
+
+    }
+}
+public class TransitionLineToBar extends Transition<LineGraph, BarGraph> {
 
 
-        fill(255, 0, 0);
-        ellipse(width/2, height/2, 100, 100);
-        if (renderFrame < (totalRenderFrame / 3)) {
-            println("in first third");
-            ellipse(width/2, height/2, 100, 100);
-/*            stageFrames = totalRenderFrame / 3;*/
-/*            int framesPerBar = stageFrames / base.getValues().size();*/
-/*            int counter = 0;*/
-/**/
-/*            ArrayList<Data> values = base.getValues();*/
-/**/
-/*            float max_height = base.findMax(values);*/
-/**/
-/*            int bar_width   = (int)((x_axis_width * 0.75)/values.size());*/
-/*            int space_width = (int)((x_axis_width * 0.25)/values.size());*/
-/**/
-/*            for (int i = 0; i < values.size(); i++) {*/
-/**/
-/*                float height_ratio = (values.get(i).getValues().get(0) / max_height);*/
-/**/
-/*                int bar_x = (x_origin + (i * bar_width) + ((i+1) * space_width));*/
-/*                int bar_y = (int)(y_origin - (y_axis_height * height_ratio));*/
-/**/
-/*                // if the highlighted one, change paint color for this rectangle to white*/
-/*                // else purdy colorz*/
-/*                fill((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);*/
-/*                */
-/*                float drawHeightRatio = (float)(renderFrame / (float)stageFrames);*/
-/*                println("dhr: " + drawHeightRatio);*/
-/*                background(255, 0, 0);*/
-/*                rect(bar_x, bar_y, bar_width, (y_axis_height * height_ratio) * drawHeightRatio);*/
-/*                fill(#000000);*/
-/**/
-/*                pushMatrix();*/
-/*                    translate(bar_x, bar_y + (y_origin - bar_y) + (height * margin_ratio /8));*/
-/*                    rotate(HALF_PI * 0.8);*/
-/*                    textSize(12);*/
-/*                    textAlign(BOTTOM);*/
-/*                    text(values.get(i).getDataName(), 0, 0);*/
-/*                    textAlign(LEFT);*/
-/*                popMatrix();*/
-/*            }*/
-        } else {
-            println("in last two third");
-            if (renderFrame  == 201) {
-                background(200, 200, 200);
-                println("clear!");
+    ArrayList<Point> points;
+    ArrayList<Data> values;
+
+	TransitionLineToBar(LineGraph base, BarGraph target) {
+		super(base, target);
+		// TODO Auto-generated constructor stub
+        points = new ArrayList<Point>();
+        values = base.getValues();
+	}
+	
+/*	@Override*/
+	public void render() {
+        println("Rendering frame = " + renderFrame);
+        /* update canvas fields */
+        int w = width;
+        int h = height;
+        float margin_ratio = base.getMarginRatio();
+        int x_axis_width  = (int)(width * (1 - 2*margin_ratio));
+        int y_axis_height = (int)(height * (1 - 2*margin_ratio));
+        int x_origin = (int)(width * margin_ratio);
+        int y_origin = (int)(height * (1 - margin_ratio));
+
+        /* re-render the parts of the graph */
+        drawAxes(margin_ratio);
+        drawLabels(x_origin, y_origin, margin_ratio);
+        
+        int stageFrames;
+        int frameOffset;
+
+        float max_height = base.findMax(values);
+
+        int bar_width   = (int)((x_axis_width * 0.75f)/values.size());
+        int space_width = (int)((x_axis_width * 0.25f)/values.size());
+
+        points.clear();
+
+        for (int i = 0; i < values.size(); i++) {
+
+            float height_ratio = (values.get(i).getValues().get(0) / max_height);
+
+            int bar_x = (x_origin + (i * bar_width) + ((i+1) * space_width));
+            int bar_y = (int)(y_origin - (y_axis_height * height_ratio));
+
+            // if the highlighted one, change paint color for this rectangle to white
+            // else purdy colorz
+            fill((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
+            
+            if (renderFrame >= (2 * totalRenderFrame/3)) {
+
+                stageFrames = totalRenderFrame / 3;
+                frameOffset = 2 * totalRenderFrame / 3;
+                float drawHeightRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
+                rect(bar_x, bar_y, bar_width, (y_axis_height * height_ratio) * (drawHeightRatio));
+
+            } else if ((renderFrame >= totalRenderFrame/2) && (renderFrame < (2 * totalRenderFrame /3))) {
+        
+                stageFrames = totalRenderFrame / 6;
+                frameOffset = totalRenderFrame / 2;
+                float drawWidthRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
+                int bar_left = bar_x;
+                int bar_right = bar_x + bar_width;
+                line(bar_left + ((bar_width/2) * (1 - drawWidthRatio)), bar_y, bar_right - ((bar_width/2) * (1 - drawWidthRatio)), bar_y);
+
+            } else if ((renderFrame >= totalRenderFrame/4) && (renderFrame < totalRenderFrame / 2)) {
+
+                stageFrames = totalRenderFrame / 4;
+                frameOffset = totalRenderFrame / 4;
+
+                int px = bar_x + bar_width/2;
+                int py = bar_y;
+                float radius = 1;
+                float radiusRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
+
+                ellipse(px, py, 5 * (1 - radiusRatio), 5 * (1 - radiusRatio));
+
+            } else if (renderFrame < (totalRenderFrame / 4)) {
+
+                stageFrames = totalRenderFrame / 4;
+                //frameOffset = totalRenderFrame / 4;
+                frameOffset = 0;
+
+                float lineRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
+
+                // make points
+                int px = bar_x + (bar_width/2);
+                int py = (int)(y_origin - (y_axis_height * height_ratio));
+
+                Point tmp = new Point(px, py);
+                points.add(tmp);
+
+                ellipse(points.get(i).getX(), points.get(i).getY(), 5, 5);
+
+                if(i > 0) {
+                    Point p1 = points.get(i-1);
+                    Point p2 = points.get(i);
+
+                    int x1 = p1.getX();
+                    int y1 = p1.getY();
+                    int x2 = p2.getX();
+                    int y2 = p2.getY();
+                    line(x1, y1, ((x2 - x1) * (1 - lineRatio)) + x1, ((y2 - y1) * (1 - lineRatio)) + y1);
+                }
             }
 
-        }
+            fill(0xff000000);
 
-/*        println("renderFrame (IN RENDER END) == " + renderFrame);*/
+            pushMatrix();
+                translate(bar_x, bar_y + (y_origin - bar_y) + (height * margin_ratio /8));
+                rotate(HALF_PI * 0.8f);
+                textSize(12);
+                textAlign(BOTTOM);
+                text(values.get(i).getDataName(), 0, 0);
+                textAlign(LEFT);
+            popMatrix();
+        }
+    }
+
+    public void drawLabels(int x_origin, int y_origin, float margin_ratio) {
+
+        textAlign(LEFT);
+        fill(0, 0, 0);
+
+        String xName = nameLabels[0];
+        String yName = nameLabels[1];
+
+        int w = width;
+        int h = height;
+
+        int axis_h = (int)(height * (1 - margin_ratio));
+        text(xName, x_origin + (w * margin_ratio / 2),
+            y_origin + (h * margin_ratio / 2),
+            x_origin + (w * margin_ratio / 2),
+            y_origin + (h * margin_ratio / 2));
+        text(yName, x_origin - (w * margin_ratio / 2),
+             y_origin - (h * margin_ratio / 2), x_origin, y_origin);
+
+    }
+
+    public void drawAxes(float margin_ratio) {
+        int axis_h = (int)(height * (1 - margin_ratio));
+        //x axis
+        line(width * margin_ratio, axis_h, (width * (1-margin_ratio)), axis_h);
+        //y axis
+        line(width * margin_ratio, axis_h, width * margin_ratio, height * margin_ratio);
+
     }
 }
 
@@ -952,11 +1233,12 @@ public class TransitionManager {
 	
 	TransitionManager(BarGraph barGraph, LineGraph lineGraph, PieGraph pieGraph) {
 		transitions = new ArrayList<Transition>();
+
 		TransitionBarToLine barToLine = new TransitionBarToLine(barGraph, lineGraph);
 		transitions.add(barToLine);
 
-        maxFrameCounter = 100;
-        frameCounter = 0;
+        TransitionLineToBar lineToBar = new TransitionLineToBar(lineGraph, barGraph);
+        transitions.add(lineToBar);
 	}
 	
 	public void addTransition(Transition<? extends Graph, ? extends Graph> transition) {

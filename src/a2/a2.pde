@@ -8,16 +8,18 @@ LineGraph lineGraph;
 PieGraph pieGraph;
 
 RenderState currentRenderState;
-RenderState prevRenderState;
+Graph currentGraph;
 String data_path = "data.csv";
 
 
 ArrayList<Data> dataPoints = new ArrayList<Data>();
 String[] nameLabels;
+int time;
 
 void setup() {
 
     size(800, 600);
+    frameRate(60);
     if(frame != null) {
         frame.setResizable(true);
     }
@@ -32,58 +34,106 @@ void setup() {
     transitionManager = new TransitionManager(barGraph, lineGraph, pieGraph);
 
     currentRenderState = RenderState.LINE_RS;
+    currentGraph = lineGraph;
+    
+    time = 0;
 }
 
 void mousePressed() {
-    for (Button b : lineGraph.getButtons()) {
+    println("mouse pressed");
+    for (Button b : currentGraph.getButtons()) {
         if (b.isInside(mouseX, mouseY)) {
-            prevRenderState = currentRenderState;
-            currentRenderState = b.getRenderState();
-            println("CHANGED RENDER STATES");
+            println("clicked on button");
+            if (currentRenderState == RenderState.BAR_RS) {
+                println("currently BAR");
+                if (b.getRenderState() == RenderState.LINE_RS) {
+                    println("want LINE");
+                    currentRenderState = RenderState.BAR2LINE_RS;
+                    currentGraph = barGraph;
+                } else if (b.getRenderState() == RenderState.PIE_RS) {
+                    println("want PIE");
+                    currentRenderState = RenderState.BAR2PIE_RS;
+                    currentGraph = pieGraph;
+                } else {
+                    println("want BAR");
+                    currentRenderState = RenderState.BAR_RS;
+                    currentGraph = barGraph;
+                }
+            } else if (currentRenderState == RenderState.LINE_RS) {
+                println("currently LINE");
+                if (b.getRenderState() == RenderState.BAR_RS) {
+                    println("want BAR");
+                    currentRenderState = RenderState.LINE2BAR_RS;
+                    currentGraph = barGraph;
+                } else {
+                // no line to pie
+                    println("want LINE");
+                    currentRenderState = RenderState.LINE_RS;
+                    currentGraph = lineGraph;
+                }
+            } else if (currentRenderState == RenderState.PIE_RS) {
+                println("currently PIE");
+                if (b.getRenderState() == RenderState.BAR_RS) {
+                    println("want BAR");
+                    currentRenderState = RenderState.PIE2BAR_RS;
+                    currentGraph = barGraph;
+                } else {
+                    println("want PIE");
+                    currentRenderState = RenderState.PIE_RS;
+                    currentGraph = pieGraph;
+                }
+            }
         }
     }
 }
 
 void draw() {
-    println("in draw!");
-    if (prevRenderState == RenderState.BAR_RS && currentRenderState == RenderState.LINE_RS) {
-        println("1");
-        //Transition t = transitionManager.getTransition(BarGraph.class, LineGraph.class);
-
-        TransitionBarToLine t = new TransitionBarToLine(barGraph, lineGraph);
-/*        clear();*/
+    background(200, 200, 200);
+    currentGraph.renderButtons();
+    Transition t;
+    switch (currentRenderState) {
+    case BAR2LINE_RS:
+        t = transitionManager.getTransition(BarGraph.class, LineGraph.class);
         drawTransition(t);
-        println("2");
-    } else {
-        switch (currentRenderState) {
-        case LINE_RS:
-            background(200, 200, 200);
-            lineGraph.render();
-            lineGraph.renderButtons();
-            break;
-        case BAR_RS:
-/*            background(200, 200, 200);*/
-            //barGraph.render();
-            barGraph.renderButtons();
-            break;
-        case PIE_RS:
-            background(200, 200, 200);
-            pieGraph.render();
-            pieGraph.renderButtons();
-            break;
-        }
+        break;
+    case BAR2PIE_RS:
+        currentRenderState = RenderState.PIE_RS;
+        break;
+    case LINE2BAR_RS:
+        t = transitionManager.getTransition(LineGraph.class, BarGraph.class);
+        drawTransition(t);
+        break;
+     case PIE2BAR_RS:
+        currentRenderState = RenderState.BAR_RS;
+        break;
+    case LINE_RS:
+        lineGraph.render();
+/*        lineGraph.renderButtons();*/
+        break;
+    case BAR_RS:
+        barGraph.render();
+/*        barGraph.renderButtons();*/
+        break;
+    case PIE_RS:
+        pieGraph.render();
+/*        pieGraph.renderButtons();*/
+        break;
     }
 }
 
 void drawTransition(Transition transition) {
-    while (!transition.isDone()) {
-/*        background(200, 200, 200);*/
-        //println("rendering t = " + transition.getRenderFrame());
-/*        if(transition.getRenderFrame() == 200) {*/
-/*            println(">>DISAPPEAR!");*/
-/*        }*/
+    if (!transition.isDone()) {
         transition.render();
         transition.tick();
+    } else {
+        transition.resetRenderFrame();
+        if (transition.getTargetClass() == BarGraph.class) {
+            currentRenderState = RenderState.BAR_RS;
+        } else if (transition.getTargetClass() == LineGraph.class) {
+            currentRenderState = RenderState.LINE_RS;
+        } else if (transition.getTargetClass() == PieGraph.class) {
+            currentRenderState = RenderState.PIE_RS;
+        }
     }
 }
 

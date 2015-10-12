@@ -33,28 +33,38 @@ public class Button implements Renderable {
     @Override
     public void render() {
         stroke(0, 0, 0);
-        if (isInside(mouseX, mouseY)) {
-            fill(255, 0, 0);
+        if (currentRenderState == RenderState.LINE_RS || currentRenderState == RenderState.BAR_RS || currentRenderState == RenderState.PIE_RS) {
+            if (isInside(mouseX, mouseY)) {
+                fill(255, 0, 0);
+            } else {
+                //fill (100, 100, 100);
+                fill(255, 255, 255);
+            }
         } else {
-            //fill (100, 100, 100);
-            fill(255, 255, 255);
+            fill(55, 55, 55);
         }
         rect(x, y, w, h);
-        String t = "";
-        switch(state) {
-            case LINE_RS:
-                t = "LINE";
-                break;
-            case BAR_RS:
-                t = "BAR";
-                break;
-            case PIE_RS:
-                t = "PIE";
-                break;
+
+        if (currentRenderState == RenderState.LINE_RS || currentRenderState == RenderState.BAR_RS || currentRenderState == RenderState.PIE_RS) {
+            String t = "";
+            switch(state) {
+                case LINE_RS:
+                    t = "LINE";
+                    break;
+                case BAR_RS:
+                    t = "BAR";
+                    break;
+                case PIE_RS:
+                    t = "PIE";
+                    break;
+                default:
+            }
+            textAlign(CENTER);
+            //text(t, x + w/2, y + h/2, w, h);
+            fill(0, 255, 0);
+            text(t, x , y , w, h);
+        } else {
+
         }
-        textAlign(CENTER);
-        //text(t, x + w/2, y + h/2, w, h);
-        fill(0, 255, 0);
-        text(t, x , y , w, h);
     }
 }

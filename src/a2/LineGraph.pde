@@ -118,7 +118,7 @@ public class LineGraph extends Graph {
     void drawPoints() {
         int i = 0;
         for(Point p : points) {
-            fill(0, 0, 0);
+            fill((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
             ellipse(p.getX(), p.getY(), 5, 5);
 
             // draw data labels 
@@ -131,6 +131,7 @@ public class LineGraph extends Graph {
             rotate(HALF_PI * 0.8);
             textSize(12);
             textAlign(BOTTOM);
+            fill(0, 0, 0);
             text(values.get(i).getDataName(), 0, 0);
             textAlign(LEFT);
             popMatrix();
