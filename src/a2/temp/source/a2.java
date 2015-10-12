@@ -56,19 +56,30 @@ public void setup() {
     renderState = RenderState.LINE_RS;
 }
 
+public void mousePressed() {
+    for (Button b : lineGraph.getButtons()) {
+        if (b.isInside(mouseX, mouseY)) {
+            renderState = b.getRenderState();
+        }
+    }
+}
+
 public void draw() {
-
-    //shit.txt
-/*    pieGraph.render();*/
-/*    barGraph.render();*/
-    lineGraph.render();
-
     switch (renderState) {
     case LINE_RS:
+        background(200, 200, 200);
+        lineGraph.render();
+        lineGraph.renderButtons();
         break;
     case BAR_RS:
+        background(200, 200, 200);
+        barGraph.render();
+        barGraph.renderButtons();
         break;
     case PIE_RS:
+        background(200, 200, 200);
+        pieGraph.render();
+        pieGraph.renderButtons();
         break;
     }
 }
@@ -115,7 +126,6 @@ public class BarGraph extends Graph {
     // meta 
     String xName;
     String yName;
-    final float margin_ratio = 0.15f;
     int highlighted = -1;
 
     // data
@@ -132,6 +142,12 @@ public class BarGraph extends Graph {
 
         x_origin = (int)(w * margin_ratio);
         y_origin = (int)(h * (1 - margin_ratio));
+
+        println("BARGRAPH------------");
+        println("xo: " + x_origin);
+        println("yo: " + y_origin);
+        println("w: " + w);
+        println("h: " + h);
 
         xName = nameLabels[0];
         yName = nameLabels[1];
@@ -177,11 +193,14 @@ public class BarGraph extends Graph {
 
     public void drawLabels(int x_origin, int y_origin) {
 
+        textAlign(LEFT);
+        fill(0, 0, 0);
         int axis_h = (int)(height * (1 - margin_ratio));
         text(xName, x_origin + (w * margin_ratio / 2),
             y_origin + (h * margin_ratio / 2),
             x_origin + (w * margin_ratio / 2),
             y_origin + (h * margin_ratio / 2));
+
         text(yName, x_origin - (w * margin_ratio / 2),
              y_origin - (h * margin_ratio / 2), x_origin, y_origin);
 
@@ -255,6 +274,66 @@ public class BarGraph extends Graph {
         highlighted = -1;
     }
 }
+public class Button implements Renderable {
+    int x, y, w, h;
+    RenderState state;
+
+    Button() {
+        x = 0;
+        y = 0;
+        w = 0;
+        h = 0;
+        state = null;
+    }
+
+    Button(int a, int b, int c, int d, RenderState rs) {
+        x = a;
+        y = b;
+        w = c;
+        h = d;
+        state = rs;
+    }
+
+    public boolean isInside(int mx, int my) {
+        if((mx < x + w && mx > x) && (my < y + h && my > y)) {
+            return true;
+        }
+        
+        return false;
+    }
+
+    public RenderState getRenderState() {
+        return state;
+    }
+
+    @Override
+    public void render() {
+        stroke(0, 0, 0);
+        if (isInside(mouseX, mouseY)) {
+            fill(255, 0, 0);
+        } else {
+            //fill (100, 100, 100);
+            fill(255, 255, 255);
+        }
+        rect(x, y, w, h);
+        String t = "";
+        switch(state) {
+            case LINE_RS:
+                t = "LINE";
+                break;
+            case BAR_RS:
+                t = "BAR";
+                break;
+            case PIE_RS:
+                t = "PIE";
+                break;
+        }
+        textAlign(CENTER);
+        //text(t, x + w/2, y + h/2, w, h);
+        fill(0, 255, 0);
+        text(t, x , y , w, h);
+    }
+}
 
 
 public class Data {
@@ -288,9 +367,12 @@ public class Data {
 
 public abstract class Graph implements Renderable {
 	private ArrayList<Data> values;
+    private ArrayList<Button> buttons;
+    final float margin_ratio = 0.2f;
 	
 	Graph(ArrayList<Data> values) {
 		this.values = values;
+        buttons = new ArrayList<Button>();
 	}
 
     public float findMax(ArrayList<Data> arr) {
@@ -301,6 +383,43 @@ public abstract class Graph implements Renderable {
             }
         }
         return max;
+    }
+
+    public ArrayList<Button> getButtons() {
+        return buttons;
+    }
+
+    public void makeButtons() {
+        
+        buttons.clear();
+        int bw, bh, sp;
+
+        bw = (int)(width  * (2.0f/9.0f));
+        bh = (int)(((margin_ratio * height) * (1.0f/4.0f)));
+        sp = (int)(width *  (1.0f/9.0f));
+
+        RenderState state;
+        for (int i = 0; i < 3; i++) {
+            if (i == 0) {
+                state = RenderState.LINE_RS;
+            } else if (i == 1) {
+                state = RenderState.BAR_RS;
+            } else if (i == 2) {
+                state = RenderState.PIE_RS;
+            } else {
+                state = null;
+            }
+            Button b = new Button(sp/2 + (i * bw) + (sp * i),
+                                  (int)(height - (height * margin_ratio)) + (3 *bh), bw, bh, state);
+            buttons.add(b);
+        }
+    }
+
+    public void renderButtons() {
+        makeButtons();
+        for (Button b : buttons) {
+            b.render();
+        }
     }
 
 
@@ -321,7 +440,6 @@ public class LineGraph extends Graph {
     // meta 
     String xName;
     String yName;
-    final float margin_ratio = 0.15f;
     int highlighted = -1;
 
     // data
@@ -340,6 +458,12 @@ public class LineGraph extends Graph {
         x_origin = (int)(w * margin_ratio);
         y_origin = (int)(h * (1 - margin_ratio));
 
+        println("LINEGRAPH------------");
+        println("xo: " + x_origin);
+        println("yo: " + y_origin);
+        println("w: " + w);
+        println("h: " + h);
+
         xName = nameLabels[0];
         yName = nameLabels[1];
 
@@ -351,7 +475,6 @@ public class LineGraph extends Graph {
         }
 
         points = new ArrayList<Point>();
-        makePoints();
 
 	}
 
@@ -369,11 +492,12 @@ public class LineGraph extends Graph {
 /*        isHovering();*/
 
         /* re-render the parts of the graph */
+        points.clear();
+        makePoints();
         drawAxes(x_origin, y_origin);
         drawLabels(x_origin, y_origin);
         drawPoints();
         drawLines();
-        
 	}
 
     public void drawAxes(int x_origin, int y_origin) {
@@ -388,6 +512,9 @@ public class LineGraph extends Graph {
     }
 
     public void drawLabels(int x_origin, int y_origin) {
+
+        textAlign(LEFT);
+        fill(0, 0, 0);
 
         int axis_h = (int)(height * (1 - margin_ratio));
         text(xName, x_origin + (w * margin_ratio / 2),
@@ -412,7 +539,6 @@ public class LineGraph extends Graph {
 
             Point tmp = new Point(px, py);
             points.add(tmp);
-            println("adding new point at: " + px + ", " + py);
         }
     }
 
@@ -426,8 +552,6 @@ public class LineGraph extends Graph {
             pushMatrix();
             //slanted under data
             //translate(p.getX(), p.getY() + (y_axis_height * (p.getY()/y_axis_height)) + (h * margin_ratio /8));
-/*            int py = p.getY();*/
-/*            int toAxis = y_origin - p.getY();*/
             translate(p.getX(), p.getY() + (y_origin - p.getY()) + (height * margin_ratio /8));
             rotate(HALF_PI * 0.8f);
             text(values.get(i).getDataName(), 0, 0);
@@ -440,7 +564,6 @@ public class LineGraph extends Graph {
         for(int i = 1; i < points.size(); i++) {
             Point p1 = points.get(i - 1); 
             Point p2 = points.get(i); 
-
             line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
         }
     }
@@ -460,7 +583,6 @@ public class LineGraph extends Graph {
     // meta 
     String xName;
     String yName;
-    final float margin_ratio = 0.15f;
     int highlighted = -1;
 
     ///data
@@ -545,7 +667,7 @@ public class LineGraph extends Graph {
         y_origin = (int)(height / 2);
 
         /* set radii appropriately */
-        radius =(int) ((height < width) ? (height/ (4.0f/3)) : (width / (4.0f/3)));
+        radius =(int) ((height < width) ? (height/ (5.0f/3)) : (width / (5.0f/3)));
 
         /* re-render the parts of the graph */
         drawSlices();

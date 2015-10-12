@@ -33,19 +33,30 @@ void setup() {
     renderState = RenderState.LINE_RS;
 }
 
+void mousePressed() {
+    for (Button b : lineGraph.getButtons()) {
+        if (b.isInside(mouseX, mouseY)) {
+            renderState = b.getRenderState();
+        }
+    }
+}
+
 void draw() {
-
-    //shit.txt
-/*    pieGraph.render();*/
-/*    barGraph.render();*/
-    lineGraph.render();
-
     switch (renderState) {
     case LINE_RS:
+        background(200, 200, 200);
+        lineGraph.render();
+        lineGraph.renderButtons();
         break;
     case BAR_RS:
+        background(200, 200, 200);
+        barGraph.render();
+        barGraph.renderButtons();
         break;
     case PIE_RS:
+        background(200, 200, 200);
+        pieGraph.render();
+        pieGraph.renderButtons();
         break;
     }
 }

@@ -13,7 +13,6 @@ public class BarGraph extends Graph {
     // meta 
     String xName;
     String yName;
-    final float margin_ratio = 0.15;
     int highlighted = -1;
 
     // data
@@ -30,6 +29,12 @@ public class BarGraph extends Graph {
 
         x_origin = (int)(w * margin_ratio);
         y_origin = (int)(h * (1 - margin_ratio));
+
+        println("BARGRAPH------------");
+        println("xo: " + x_origin);
+        println("yo: " + y_origin);
+        println("w: " + w);
+        println("h: " + h);
 
         xName = nameLabels[0];
         yName = nameLabels[1];
@@ -75,11 +80,14 @@ public class BarGraph extends Graph {
 
     void drawLabels(int x_origin, int y_origin) {
 
+        textAlign(LEFT);
+        fill(0, 0, 0);
         int axis_h = (int)(height * (1 - margin_ratio));
         text(xName, x_origin + (w * margin_ratio / 2),
             y_origin + (h * margin_ratio / 2),
             x_origin + (w * margin_ratio / 2),
             y_origin + (h * margin_ratio / 2));
+
         text(yName, x_origin - (w * margin_ratio / 2),
              y_origin - (h * margin_ratio / 2), x_origin, y_origin);
 

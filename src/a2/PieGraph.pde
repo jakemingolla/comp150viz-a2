@@ -11,7 +11,6 @@
     // meta 
     String xName;
     String yName;
-    final float margin_ratio = 0.15;
     int highlighted = -1;
 
     ///data
@@ -34,7 +33,7 @@
         xName = nameLabels[0];
         yName = nameLabels[1];
 
-        radius = (int)(height/(4.0/3));
+        radius = (int)(height/(5.0/3));
 
         this.values = values;
 
@@ -96,7 +95,7 @@
         y_origin = (int)(height / 2);
 
         /* set radii appropriately */
-        radius =(int) ((height < width) ? (height/ (4.0/3)) : (width / (4.0/3)));
+        radius =(int) ((height < width) ? (height/ (5.0/3)) : (width / (5.0/3)));
 
         /* re-render the parts of the graph */
         drawSlices();

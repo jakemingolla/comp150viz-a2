@@ -14,7 +14,6 @@ public class LineGraph extends Graph {
     // meta 
     String xName;
     String yName;
-    final float margin_ratio = 0.15;
     int highlighted = -1;
 
     // data
@@ -33,6 +32,12 @@ public class LineGraph extends Graph {
         x_origin = (int)(w * margin_ratio);
         y_origin = (int)(h * (1 - margin_ratio));
 
+        println("LINEGRAPH------------");
+        println("xo: " + x_origin);
+        println("yo: " + y_origin);
+        println("w: " + w);
+        println("h: " + h);
+
         xName = nameLabels[0];
         yName = nameLabels[1];
 
@@ -44,7 +49,6 @@ public class LineGraph extends Graph {
         }
 
         points = new ArrayList<Point>();
-        makePoints();
 
 	}
 
@@ -62,11 +66,12 @@ public class LineGraph extends Graph {
 /*        isHovering();*/
 
         /* re-render the parts of the graph */
+        points.clear();
+        makePoints();
         drawAxes(x_origin, y_origin);
         drawLabels(x_origin, y_origin);
         drawPoints();
         drawLines();
-        
 	}
 
     void drawAxes(int x_origin, int y_origin) {
@@ -81,6 +86,9 @@ public class LineGraph extends Graph {
     }
 
     void drawLabels(int x_origin, int y_origin) {
+
+        textAlign(LEFT);
+        fill(0, 0, 0);
 
         int axis_h = (int)(height * (1 - margin_ratio));
         text(xName, x_origin + (w * margin_ratio / 2),
@@ -130,7 +138,6 @@ public class LineGraph extends Graph {
         for(int i = 1; i < points.size(); i++) {
             Point p1 = points.get(i - 1); 
             Point p2 = points.get(i); 
-
             line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
         }
     }
