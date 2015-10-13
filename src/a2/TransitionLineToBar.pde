@@ -48,6 +48,7 @@ public class TransitionLineToBar extends Transition<LineGraph, BarGraph> {
             // if the highlighted one, change paint color for this rectangle to white
             // else purdy colorz
             fill((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
+            stroke((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
             
             // recede bars
             if (renderFrame >= (2 * totalRenderFrame/3)) {
@@ -56,6 +57,7 @@ public class TransitionLineToBar extends Transition<LineGraph, BarGraph> {
                 frameOffset = 2 * totalRenderFrame / 3;
                 float drawHeightRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
                 rect(bar_x, bar_y, bar_width, (y_axis_height * height_ratio) * (drawHeightRatio));
+                stroke(0, 0, 0);
 
             } else if ((renderFrame >= totalRenderFrame/2) && (renderFrame < (2 * totalRenderFrame /3))) {
         
@@ -102,6 +104,7 @@ public class TransitionLineToBar extends Transition<LineGraph, BarGraph> {
                     int y1 = p1.getY();
                     int x2 = p2.getX();
                     int y2 = p2.getY();
+                    stroke(0, 0, 0);
                     line(x1, y1, ((x2 - x1) * (1 - lineRatio)) + x1, ((y2 - y1) * (1 - lineRatio)) + y1);
                 }
             }

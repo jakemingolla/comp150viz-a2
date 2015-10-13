@@ -1,10 +1,9 @@
-public class TransitionBarToPie extends Transition<BarGraph, PieGraph> {
-
+public class TransitionPieToBar extends Transition<PieGraph, BarGraph> {
 
     ArrayList<Point> points;
     ArrayList<Data> values;
 
-	TransitionBarToPie(BarGraph base, PieGraph target) {
+	TransitionPieToBar(PieGraph base, BarGraph target) {
 		super(base, target);
         points = new ArrayList<Point>();
         values = base.getValues();
@@ -26,14 +25,13 @@ public class TransitionBarToPie extends Transition<BarGraph, PieGraph> {
         int stageFrames;
         int frameOffset;
 
-        if (renderFrame < (totalRenderFrame / 10)) {
+        if (renderFrame >= (9 * totalRenderFrame / 10)) {
             stageFrames = totalRenderFrame /10;
-            frameOffset = 0;
+            frameOffset = 9 * totalRenderFrame / 10;
             float fadeRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
-            println("fade ratio == " + fadeRatio);
 
-            drawAxes(margin_ratio, fadeRatio);
-            drawLabels(x_origin, y_origin, margin_ratio, fadeRatio);
+            drawAxes(margin_ratio, (1 - fadeRatio));
+            drawLabels(x_origin, y_origin, margin_ratio, (1 - fadeRatio));
         }
         
 
@@ -55,22 +53,22 @@ public class TransitionBarToPie extends Transition<BarGraph, PieGraph> {
             fill((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
             stroke((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
             
-            if (renderFrame < (totalRenderFrame / 10)) {
+            if (renderFrame >= (9 * totalRenderFrame / 10)) {
 
                 stageFrames = totalRenderFrame / 10;
-                frameOffset = 0;
+                frameOffset = 9 * totalRenderFrame / 10;
                 float pinchRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
 
                 int bar_left = bar_x;
                 int bar_right = bar_x + bar_width;
 
-                rect(bar_left + ((bar_width/2) * (pinchRatio)), bar_y, bar_width - (bar_width * pinchRatio), y_axis_height * height_ratio);
+                rect(bar_left + ((bar_width/2) * (1 - pinchRatio)), bar_y, bar_width - (bar_width * (1 - pinchRatio)), y_axis_height * height_ratio);
 
 
-            } else if ((renderFrame >= totalRenderFrame/10) && (renderFrame < totalRenderFrame /5)) {
+            } else if ((renderFrame >= 8 * totalRenderFrame/10) && (renderFrame < 9 * totalRenderFrame /10)) {
         
                 stageFrames = totalRenderFrame / 10;
-                frameOffset = totalRenderFrame / 10;
+                frameOffset = 8 * totalRenderFrame / 10;
                 float shrinkRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
 
                 int target_height = (int)((values.get(i).getValues().get(0) / sum) * (PI * diameter));
@@ -81,13 +79,13 @@ public class TransitionBarToPie extends Transition<BarGraph, PieGraph> {
                 int target_top = y_origin - target_height;
                 int target_diff = target_top - top_y;
 
-                int new_top = (int)(top_y + shrinkRatio * (target_diff));
+                int new_top = (int)(top_y + (1 - shrinkRatio) * (target_diff));
 
                 line(bar_x + bar_width/2, new_top, bar_x + bar_width/2, y_origin);
 
-            } else if ((renderFrame >= totalRenderFrame/5) && (renderFrame < totalRenderFrame / 2)) {
+            } else if ((renderFrame >= totalRenderFrame/2) && (renderFrame < 4 * totalRenderFrame / 5)) {
                 stageFrames = 3 * totalRenderFrame / 10;
-                frameOffset = totalRenderFrame / 5;
+                frameOffset = totalRenderFrame / 2;
 
                 float moveRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
 
@@ -121,16 +119,16 @@ public class TransitionBarToPie extends Transition<BarGraph, PieGraph> {
                 int diff_y1 = start_y - y_1;
                 int diff_y2 = end_y - y_2;
                 
-                line(x_1 + moveRatio * diff_x1,
-                     y_1 + moveRatio * diff_y1,
-                     x_2 + moveRatio * diff_x2,
-                     y_2 + moveRatio * diff_y2);
+                line(x_1 + (1 - moveRatio) * diff_x1,
+                     y_1 + (1 - moveRatio) * diff_y1,
+                     x_2 + (1 - moveRatio) * diff_x2,
+                     y_2 + (1 - moveRatio) * diff_y2);
 
                 tmp_pos += rad_ratio;
 
-            } else if (renderFrame >= totalRenderFrame / 2 && (renderFrame < 9 * totalRenderFrame / 10)) {
+            } else if (renderFrame >= totalRenderFrame / 10 && (renderFrame <  totalRenderFrame / 2)) {
                 stageFrames = 4 * totalRenderFrame / 10;
-                frameOffset = totalRenderFrame / 2;
+                frameOffset = totalRenderFrame / 10;
 
                 float moveRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
                 float rad_ratio = (values.get(i).getValues().get(0) / sum) * (2 * PI);
@@ -171,11 +169,11 @@ public class TransitionBarToPie extends Transition<BarGraph, PieGraph> {
 
                 tmp_pos += rad_ratio;
 
-                arc(width/2, height/2, diameter * moveRatio, diameter * moveRatio,
+                arc(width/2, height/2, diameter * (1 - moveRatio), diameter * (1 - moveRatio),
                     start_angle, end_angle);
-            } else if (renderFrame >= 9 * totalRenderFrame / 10) {
+            } else if (renderFrame < totalRenderFrame / 10) {
                 stageFrames = totalRenderFrame / 10;
-                frameOffset = 9 * totalRenderFrame / 10;
+                frameOffset = 0;
                 float alphaRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
                 
                 float rad_ratio = (values.get(i).getValues().get(0) / sum) * (2 * PI);
@@ -220,9 +218,9 @@ public class TransitionBarToPie extends Transition<BarGraph, PieGraph> {
                 String name = values.get(i).getDataName();
                 pushMatrix();
                     translate(width/2, height/2);
-                        fill(200 - (200 * alphaRatio), 
-                             200 - (200 * alphaRatio), 
-                             200 - (200 * alphaRatio));
+                        fill(200 * alphaRatio, 
+                             200 * alphaRatio, 
+                             200 * alphaRatio);
                         if (start_angle < HALF_PI || start_angle> (3 * PI / 2)) {
                         rotate(start_angle + (rad_ratio/2));
                             textAlign(CENTER);
@@ -236,11 +234,11 @@ public class TransitionBarToPie extends Transition<BarGraph, PieGraph> {
             }
    
             fill(#000000);
-            if (renderFrame < (totalRenderFrame / 10)) {
+            if (renderFrame >= (9 * totalRenderFrame / 10)) {
                 stageFrames = totalRenderFrame /10;
                 frameOffset = 0;
                 float fadeRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
-                int col = (int)(200.0 * fadeRatio);
+                int col = (int)(200.0 * (1 - fadeRatio));
                 fill(col, col, col);
                 pushMatrix();
                     translate(bar_x, bar_y + (y_origin - bar_y) + (height * margin_ratio /8));

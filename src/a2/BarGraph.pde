@@ -105,11 +105,13 @@ public class BarGraph extends Graph {
                 fill (255, 255, 255);
             // else purdy colorz
             } else {
+                stroke((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
                 fill((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
             }
 
             rect(bar_x, bar_y, bar_width, (y_axis_height * height_ratio));
             fill(#000000);
+            stroke(0, 0, 0);
 
             pushMatrix();
                 translate(bar_x, bar_y + (y_origin - bar_y) + (height * margin_ratio /8));

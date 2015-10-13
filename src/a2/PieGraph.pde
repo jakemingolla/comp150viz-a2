@@ -53,6 +53,7 @@
                 fill(255, 255, 255);
             } else {
                 fill(((color_seed) * 20) % 255, ((color_seed) * 30) % 255, ((color_seed) * 40) % 255);
+                stroke(((color_seed) * 20) % 255, ((color_seed) * 30) % 255, ((color_seed) * 40) % 255);
             }
 
             arc(x_origin, y_origin, radius, radius, tmp_pos, tmp_pos + rad_ratio);

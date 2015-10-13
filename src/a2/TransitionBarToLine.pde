@@ -47,6 +47,7 @@ public class TransitionBarToLine extends Transition<BarGraph, LineGraph> {
             // if the highlighted one, change paint color for this rectangle to white
             // else purdy colorz
             fill((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
+            stroke((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
             
             if (renderFrame < (totalRenderFrame / 3)) {
 
@@ -75,6 +76,7 @@ public class TransitionBarToLine extends Transition<BarGraph, LineGraph> {
 
 /*                fill(0, 0, 0);*/
                 ellipse(px, py, radius * radiusRatio, radius * radiusRatio);
+                stroke(0, 0, 0);
             } else if (renderFrame >= 3 * totalRenderFrame/4) {
                 stageFrames = totalRenderFrame / 4;
                 frameOffset = 3 * totalRenderFrame / 4;
@@ -100,6 +102,7 @@ public class TransitionBarToLine extends Transition<BarGraph, LineGraph> {
                     int y1 = p1.getY();
                     int x2 = p2.getX();
                     int y2 = p2.getY();
+                    stroke(0, 0, 0);
                     line(x1, y1, (x2 - x1) * lineRatio + x1, (y2 - y1) * lineRatio + y1);
                 }
             }

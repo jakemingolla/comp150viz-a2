@@ -17,6 +17,9 @@ public class TransitionManager {
 
         TransitionBarToPie barToPie = new TransitionBarToPie(barGraph, pieGraph);
         transitions.add(barToPie);
+
+        TransitionPieToBar pieToBar = new TransitionPieToBar(pieGraph, barGraph);
+        transitions.add(pieToBar);
 	}
 	
 	public void addTransition(Transition<? extends Graph, ? extends Graph> transition) {

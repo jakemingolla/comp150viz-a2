@@ -117,23 +117,25 @@ public class LineGraph extends Graph {
             if (i == highlighted) {
                 fill(255, 255, 255);
             } else {
+                stroke((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
                 fill((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
             }
             ellipse(p.getX(), p.getY(), radius, radius);
+            stroke(0, 0, 0);
 
             // draw data labels 
             pushMatrix();
-            //slanted under data
-            //translate(p.getX(), p.getY() + (y_axis_height * (p.getY()/y_axis_height)) + (h * margin_ratio /8));
+                //slanted under data
+                //translate(p.getX(), p.getY() + (y_axis_height * (p.getY()/y_axis_height)) + (h * margin_ratio /8));
 
-            int bar_width   = (int)((x_axis_width * 0.75)/values.size());
-            translate(p.getX() - (bar_width/2), p.getY() + (y_origin - p.getY()) + (height * margin_ratio /8));
-            rotate(HALF_PI * 0.8);
-            textSize(12);
-            textAlign(BOTTOM);
-            fill(0, 0, 0);
-            text(values.get(i).getDataName(), 0, 0);
-            textAlign(LEFT);
+                int bar_width   = (int)((x_axis_width * 0.75)/values.size());
+                translate(p.getX() - (bar_width/2), p.getY() + (y_origin - p.getY()) + (height * margin_ratio /8));
+                rotate(HALF_PI * 0.8);
+                textSize(12);
+                textAlign(BOTTOM);
+                fill(0, 0, 0);
+                text(values.get(i).getDataName(), 0, 0);
+                textAlign(LEFT);
             popMatrix();
             i++;
         }

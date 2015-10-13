@@ -33,8 +33,8 @@ void setup() {
 
     transitionManager = new TransitionManager(barGraph, lineGraph, pieGraph);
 
-    currentRenderState = RenderState.BAR_RS;
-    currentGraph = barGraph;
+    currentRenderState = RenderState.PIE_RS;
+    currentGraph = pieGraph;
     
     time = 0;
 }
@@ -105,7 +105,8 @@ void draw() {
         drawTransition(t);
         break;
      case PIE2BAR_RS:
-        currentRenderState = RenderState.BAR_RS;
+        t = transitionManager.getTransition(PieGraph.class, BarGraph.class);
+        drawTransition(t);
         break;
     case LINE_RS:
         lineGraph.render();
