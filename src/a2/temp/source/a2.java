@@ -23,8 +23,6 @@ public class a2 extends PApplet {
 
 
 
-/*public class a2 {*/
-
 TransitionManager transitionManager;
 BarGraph barGraph;
 LineGraph lineGraph;
@@ -32,76 +30,70 @@ PieGraph pieGraph;
 
 RenderState currentRenderState;
 Graph currentGraph;
-String data_path = "data.csv";
+String data_path = "data1.csv";
 
 
 ArrayList<Data> dataPoints = new ArrayList<Data>();
 String[] nameLabels;
 int time;
+int mfr = 100;
 
 public void setup() {
 
     size(800, 600);
-    frameRate(60);
+    frameRate(mfr);
     if(frame != null) {
         frame.setResizable(true);
     }
 
+
     ArrayList<Data> values = readData(data_path);
 
-    /* TODO add nameLabels */
     barGraph  = new BarGraph(values);
     lineGraph = new LineGraph(values);
     pieGraph = new PieGraph(values);
 
     transitionManager = new TransitionManager(barGraph, lineGraph, pieGraph);
 
-    currentRenderState = RenderState.PIE_RS;
-    currentGraph = pieGraph;
+    currentRenderState = RenderState.LINE_RS;
+    currentGraph = lineGraph;
     
     time = 0;
 }
 
 public void mousePressed() {
-    println("mouse pressed");
     for (Button b : currentGraph.getButtons()) {
         if (b.isInside(mouseX, mouseY)) {
-            println("clicked on button");
             if (currentRenderState == RenderState.BAR_RS) {
-                println("currently BAR");
                 if (b.getRenderState() == RenderState.LINE_RS) {
-                    println("want LINE");
                     currentRenderState = RenderState.BAR2LINE_RS;
                     currentGraph = barGraph;
                 } else if (b.getRenderState() == RenderState.PIE_RS) {
-                    println("want PIE");
                     currentRenderState = RenderState.BAR2PIE_RS;
                     currentGraph = pieGraph;
                 } else {
-                    println("want BAR");
                     currentRenderState = RenderState.BAR_RS;
                     currentGraph = barGraph;
                 }
             } else if (currentRenderState == RenderState.LINE_RS) {
-                println("currently LINE");
                 if (b.getRenderState() == RenderState.BAR_RS) {
-                    println("want BAR");
                     currentRenderState = RenderState.LINE2BAR_RS;
                     currentGraph = barGraph;
+                } else if (b.getRenderState() == RenderState.PIE_RS) {
+                    currentRenderState = RenderState.LINE2PIE_RS;
+                    currentGraph = pieGraph;
                 } else {
-                // no line to pie
-                    println("want LINE");
                     currentRenderState = RenderState.LINE_RS;
                     currentGraph = lineGraph;
                 }
             } else if (currentRenderState == RenderState.PIE_RS) {
-                println("currently PIE");
                 if (b.getRenderState() == RenderState.BAR_RS) {
-                    println("want BAR");
                     currentRenderState = RenderState.PIE2BAR_RS;
                     currentGraph = barGraph;
+                } else if (b.getRenderState() == RenderState.LINE_RS) {
+                    currentRenderState = RenderState.PIE2LINE_RS;
+                    currentGraph = lineGraph;
                 } else {
-                    println("want PIE");
                     currentRenderState = RenderState.PIE_RS;
                     currentGraph = pieGraph;
                 }
@@ -110,8 +102,21 @@ public void mousePressed() {
     }
 }
 
+public void keyPressed() {
+    int k = 107;
+    int j = 106;
+    if(key == j && mfr >= 20) {
+        mfr -= 10;
+    } else if (key == k && mfr <= 150) {
+        mfr += 10;
+    }
+}
+
 public void draw() {
     background(200, 200, 200);
+    frameRate(mfr);
+    text("Max Frame Rate: " + mfr, 0 ,0, width, height);
+
     currentGraph.renderButtons();
     Transition t;
     switch (currentRenderState) {
@@ -127,21 +132,36 @@ public void draw() {
         t = transitionManager.getTransition(LineGraph.class, BarGraph.class);
         drawTransition(t);
         break;
+    case LINE2PIE_RS:
+        t = transitionManager.getTransition(LineGraph.class, BarGraph.class);
+        if (!t.isDone()) {
+            drawTransition(t);
+        } else {
+            t = transitionManager.getTransition(BarGraph.class, PieGraph.class);
+            drawTransition(t);
+        }
+        break;
      case PIE2BAR_RS:
         t = transitionManager.getTransition(PieGraph.class, BarGraph.class);
         drawTransition(t);
         break;
+    case PIE2LINE_RS:
+        t = transitionManager.getTransition(PieGraph.class, BarGraph.class);
+        if (!t.isDone()) {
+            drawTransition(t);
+        } else {
+            t = transitionManager.getTransition(BarGraph.class, LineGraph.class);
+            drawTransition(t);
+        }
+        break;
     case LINE_RS:
         lineGraph.render();
-/*        lineGraph.renderButtons();*/
         break;
     case BAR_RS:
         barGraph.render();
-/*        barGraph.renderButtons();*/
         break;
     case PIE_RS:
         pieGraph.render();
-/*        pieGraph.renderButtons();*/
         break;
     }
 }
@@ -168,18 +188,11 @@ public ArrayList<Data> readData(String path) {
     String[] lines = loadStrings(path);
     nameLabels = split(lines[0], ",");
 
-    for(int i = 1; i < lines.length; i++ ) {
-        println(i + ": " + lines[i]);
-    }
-
-    println("ll: " + lines.length);
     for (int i = 1; i < lines.length; i++) {
         String[] splitLine = split(lines[i], ",");
         ArrayList<Float> floatValues = new ArrayList<Float>();
-        println("---------------");
         for (int j = 1; j < splitLine.length; j++) {
             floatValues.add(parseFloat(splitLine[j]));
-            println(splitLine[j]);
         }
         Data d = new Data(splitLine[0], floatValues);
         values.add(d);
@@ -226,10 +239,6 @@ public class BarGraph extends Graph {
 
         this.values = values;
 
-/*        println("in barGraph, values are: ");*/
-/*        for (Data d : values) {*/
-/*            println(d.getValues().get(0));*/
-/*        }*/
 	}
 
 	@Override
@@ -762,7 +771,6 @@ public class LineGraph extends Graph {
 
     public void drawLabels(String name, float startAngle, float endAngle, float radius) {
 
-/*        println(name + " at angle: " + startAngle );*/
         fill(0xff000000);
 
         pushMatrix();
@@ -1140,7 +1148,6 @@ public class TransitionBarToPie extends Transition<BarGraph, PieGraph> {
             stageFrames = totalRenderFrame /10;
             frameOffset = 0;
             float fadeRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
-            println("fade ratio == " + fadeRatio);
 
             drawAxes(margin_ratio, fadeRatio);
             drawLabels(x_origin, y_origin, margin_ratio, fadeRatio);
@@ -1369,7 +1376,6 @@ public class TransitionBarToPie extends Transition<BarGraph, PieGraph> {
 
         textAlign(LEFT);
         int col = (int) (200.0f * fadeRatio);
-        println("col == " + col);
         fill(col, col, col);
 
         String xName = nameLabels[0];
@@ -1391,7 +1397,6 @@ public class TransitionBarToPie extends Transition<BarGraph, PieGraph> {
     public void drawAxes(float margin_ratio, float fadeRatio) {
         int axis_h = (int)(height * (1 - margin_ratio));
         int col = (int) (200.0f * fadeRatio);
-        println("axes col == " + col);
         stroke(col, col, col);
         //x axis
         line(width * margin_ratio, axis_h, (width * (1-margin_ratio)), axis_h);

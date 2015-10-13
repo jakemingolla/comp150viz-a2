@@ -64,8 +64,6 @@ public class TransitionBarToLine extends Transition<BarGraph, LineGraph> {
                 int bar_left = bar_x;
                 int bar_right = bar_x + bar_width;
                 line(bar_left + ((bar_width/2) * (drawWidthRatio)), bar_y, bar_right - ((bar_width/2) * (drawWidthRatio)), bar_y);
-/*                line(bar_x + ((bar_width/2) * (1 - drawWidthRatio)), bar_y, (bar_x + (bar_width/2)) - ((bar_width/2) * (1 - drawWidthRatio)), bar_y);*/
-/*                println("in middle third, frame = " + renderFrame);*/
             } else if ((renderFrame >= totalRenderFrame/2) && (renderFrame < 3 * totalRenderFrame / 4)) {
                 stageFrames = totalRenderFrame / 4;
                 frameOffset = totalRenderFrame / 2;

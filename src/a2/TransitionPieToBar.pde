@@ -257,7 +257,6 @@ public class TransitionPieToBar extends Transition<PieGraph, BarGraph> {
 
         textAlign(LEFT);
         int col = (int) (200.0 * fadeRatio);
-        println("col == " + col);
         fill(col, col, col);
 
         String xName = nameLabels[0];
@@ -279,7 +278,6 @@ public class TransitionPieToBar extends Transition<PieGraph, BarGraph> {
     void drawAxes(float margin_ratio, float fadeRatio) {
         int axis_h = (int)(height * (1 - margin_ratio));
         int col = (int) (200.0 * fadeRatio);
-        println("axes col == " + col);
         stroke(col, col, col);
         //x axis
         line(width * margin_ratio, axis_h, (width * (1-margin_ratio)), axis_h);

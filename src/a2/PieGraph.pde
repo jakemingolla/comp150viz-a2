@@ -68,7 +68,6 @@
 
     void drawLabels(String name, float startAngle, float endAngle, float radius) {
 
-/*        println(name + " at angle: " + startAngle );*/
         fill(#000000);
 
         pushMatrix();

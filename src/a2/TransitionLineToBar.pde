@@ -14,7 +14,6 @@ public class TransitionLineToBar extends Transition<LineGraph, BarGraph> {
 	
 /*	@Override*/
 	void render() {
-        println("Rendering frame = " + renderFrame);
         /* update canvas fields */
         int w = width;
         int h = height;

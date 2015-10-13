@@ -35,10 +35,6 @@ public class BarGraph extends Graph {
 
         this.values = values;
 
-/*        println("in barGraph, values are: ");*/
-/*        for (Data d : values) {*/
-/*            println(d.getValues().get(0));*/
-/*        }*/
 	}
 
 	@Override
