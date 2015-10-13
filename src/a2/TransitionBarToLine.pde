@@ -3,6 +3,7 @@ public class TransitionBarToLine extends Transition<BarGraph, LineGraph> {
 
     ArrayList<Point> points;
     ArrayList<Data> values;
+    int radius = 8;
 
 	TransitionBarToLine(BarGraph base, LineGraph target) {
 		super(base, target);
@@ -70,11 +71,10 @@ public class TransitionBarToLine extends Transition<BarGraph, LineGraph> {
 
                 int px = bar_x + bar_width/2;
                 int py = bar_y;
-                float radius = 1;
                 float radiusRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
 
 /*                fill(0, 0, 0);*/
-                ellipse(px, py, 5 * radiusRatio, 5 * radiusRatio);
+                ellipse(px, py, radius * radiusRatio, radius * radiusRatio);
             } else if (renderFrame >= 3 * totalRenderFrame/4) {
                 stageFrames = totalRenderFrame / 4;
                 frameOffset = 3 * totalRenderFrame / 4;
@@ -90,7 +90,7 @@ public class TransitionBarToLine extends Transition<BarGraph, LineGraph> {
                 Point tmp = new Point(px, py);
                 points.add(tmp);
 
-                ellipse(points.get(i).getX(), points.get(i).getY(), 5, 5);
+                ellipse(points.get(i).getX(), points.get(i).getY(), radius, radius);
 
                 if(i > 0) {
                     Point p1 = points.get(i-1);

@@ -15,6 +15,7 @@ public class LineGraph extends Graph {
     String xName;
     String yName;
     int highlighted = -1;
+    int radius = 8;
 
     // data
     ArrayList<Data>  values;
@@ -37,11 +38,6 @@ public class LineGraph extends Graph {
 
         this.values = values;
 
-/*        println("in line graph, values are: ");*/
-/*        for (Data d : values) {*/
-/*            println(d.getValues().get(0));*/
-/*        }*/
-
         points = new ArrayList<Point>();
 
 	}
@@ -57,11 +53,11 @@ public class LineGraph extends Graph {
         y_origin = (int)(height * (1 - margin_ratio));
 
     
-/*        isHovering();*/
 
         /* re-render the parts of the graph */
         points.clear();
         makePoints();
+        isHovering();
         drawAxes(x_origin, y_origin);
         drawLabels(x_origin, y_origin);
         drawPoints();
@@ -118,8 +114,12 @@ public class LineGraph extends Graph {
     void drawPoints() {
         int i = 0;
         for(Point p : points) {
-            fill((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
-            ellipse(p.getX(), p.getY(), 5, 5);
+            if (i == highlighted) {
+                fill(255, 255, 255);
+            } else {
+                fill((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
+            }
+            ellipse(p.getX(), p.getY(), radius, radius);
 
             // draw data labels 
             pushMatrix();
@@ -145,6 +145,23 @@ public class LineGraph extends Graph {
             Point p2 = points.get(i); 
             line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
         }
+    }
+
+    void isHovering() {
+        
+        int my = mouseY;
+        int mx = mouseX;
+
+        int counter = 0;
+
+        for (Point p: points) {
+            if(abs(my - p.getY()) < radius && abs(mx - p.getX()) < radius) {
+                highlighted = counter;
+                return;
+            }
+            counter++;
+        }
+        highlighted = -1;
     }
 
 

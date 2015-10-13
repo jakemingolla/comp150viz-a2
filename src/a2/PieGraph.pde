@@ -50,9 +50,9 @@
             float rad_ratio = (d.getValues().get(0)/sum) * 2 * PI;
             float tmp = (rad_ratio/(2*PI)) * 360;
             if( color_seed == highlighted) {
-                fill(255, 0, 0);
+                fill(255, 255, 255);
             } else {
-                fill(((color_seed + 1) * 50) % 255, ((color_seed + 2) * 40) % 255, ((color_seed + 3) * 30) % 255);
+                fill(((color_seed) * 20) % 255, ((color_seed) * 30) % 255, ((color_seed) * 40) % 255);
             }
 
             arc(x_origin, y_origin, radius, radius, tmp_pos, tmp_pos + rad_ratio);

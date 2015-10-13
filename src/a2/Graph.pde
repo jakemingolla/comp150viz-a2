@@ -20,6 +20,14 @@ public abstract class Graph implements Renderable {
         return max;
     }
 
+    float findSum(ArrayList<Data> arr) {
+        float sum = 0;
+        for (Data d : arr) {
+            sum += d.getValues().get(0);
+        }
+        return sum;
+    }
+
     public ArrayList<Button> getButtons() {
         return buttons;
     }

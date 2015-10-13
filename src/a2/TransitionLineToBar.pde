@@ -3,6 +3,7 @@ public class TransitionLineToBar extends Transition<LineGraph, BarGraph> {
 
     ArrayList<Point> points;
     ArrayList<Data> values;
+    int radius = 8;
 
 	TransitionLineToBar(LineGraph base, BarGraph target) {
 		super(base, target);
@@ -48,6 +49,7 @@ public class TransitionLineToBar extends Transition<LineGraph, BarGraph> {
             // else purdy colorz
             fill((20 * i) % 255, (30 * i) % 255, (40 * i) % 255);
             
+            // recede bars
             if (renderFrame >= (2 * totalRenderFrame/3)) {
 
                 stageFrames = totalRenderFrame / 3;
@@ -71,10 +73,9 @@ public class TransitionLineToBar extends Transition<LineGraph, BarGraph> {
 
                 int px = bar_x + bar_width/2;
                 int py = bar_y;
-                float radius = 1;
                 float radiusRatio = (float)((renderFrame - frameOffset) / (float)stageFrames);
 
-                ellipse(px, py, 5 * (1 - radiusRatio), 5 * (1 - radiusRatio));
+                ellipse(px, py, radius * (1 - radiusRatio), radius * (1 - radiusRatio));
 
             } else if (renderFrame < (totalRenderFrame / 4)) {
 
@@ -91,7 +92,7 @@ public class TransitionLineToBar extends Transition<LineGraph, BarGraph> {
                 Point tmp = new Point(px, py);
                 points.add(tmp);
 
-                ellipse(points.get(i).getX(), points.get(i).getY(), 5, 5);
+                ellipse(points.get(i).getX(), points.get(i).getY(), radius, radius);
 
                 if(i > 0) {
                     Point p1 = points.get(i-1);
